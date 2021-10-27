@@ -4,8 +4,11 @@ import logo from "./logo.svg";
 import "./App.css";
 import "antd/dist/antd.css";
 import "./index.css";
-import { Tabs, Layout, Input, List } from "antd";
+import { Tabs, Layout, Input, List, Button } from "antd";
+import MenuBar from "./containers/MenuBar";
+import UIController from "./controllers/UIController";
 
+const testy = new UIController();
 const { Header, Footer, Sider, Content } = Layout;
 const { TextArea } = Input;
 
@@ -17,6 +20,7 @@ const data = [
   "Scenario 3",
   "Scenario 4",
   "Scenario 5",
+  "Scenario 6",
 ];
 
 const initialPanes = [
@@ -30,7 +34,7 @@ const initialPanes = [
   },
 ];
 
-class Demo extends React.Component {
+class App extends React.Component {
   newTabIndex = 0;
 
   state = {
@@ -89,6 +93,7 @@ class Demo extends React.Component {
     return (
       <div>
         <Layout>
+        <MenuBar></MenuBar>
           <Header>
             <Tabs
               type="editable-card"
@@ -109,7 +114,8 @@ class Demo extends React.Component {
           </Header>
           <Layout>
             <Sider width={350}>
-              <TextArea rows={25} />
+              <TextArea id="DSLTextBox" rows={25} />
+              <Button onClick={testy.getInputtedDSL}>Generate</Button>
             </Sider>
             <Content>Tree</Content>
             <Sider>
@@ -118,9 +124,7 @@ class Demo extends React.Component {
                 footer={<div>Footer</div>}
                 bordered
                 dataSource={data}
-                renderItem={(item) => (
-                  <List.Item>{item}</List.Item>
-                )}
+                renderItem={(item) => <List.Item>{item}</List.Item>}
               />
             </Sider>
           </Layout>
@@ -131,4 +135,4 @@ class Demo extends React.Component {
   }
 }
 
-export default Demo;
+export default App;
