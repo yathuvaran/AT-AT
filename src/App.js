@@ -1,12 +1,12 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import logo from "./logo.svg";
-import "./App.css";
 import "antd/dist/antd.css";
 import "./index.css";
 import { Tabs, Layout, Input, List, Button } from "antd";
 import MenuBar from "./containers/MenuBar";
 import UIController from "./controllers/UIController";
+import { blue } from '@ant-design/colors';
 
 const testy = new UIController();
 const { Header, Footer, Sider, Content } = Layout;
@@ -93,7 +93,7 @@ class App extends React.Component {
     return (
       <div>
         <Layout>
-        <MenuBar></MenuBar>
+          <MenuBar></MenuBar>
           <Header>
             <Tabs
               type="editable-card"
@@ -118,8 +118,8 @@ class App extends React.Component {
               <Button onClick={testy.getInputtedDSL}>Generate</Button>
             </Sider>
             <Content>Tree</Content>
-            <Sider>
-              <List
+            <Sider style={{backgroundColor: blue[2]}}>
+              <List 
                 header={<div>Header</div>}
                 footer={<div>Footer</div>}
                 bordered
