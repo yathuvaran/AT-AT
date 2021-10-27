@@ -6,7 +6,7 @@ import "./index.css";
 import { Tabs, Layout, Input, List, Button } from "antd";
 import MenuBar from "./containers/MenuBar";
 import UIController from "./controllers/UIController";
-import { blue } from '@ant-design/colors';
+import { blue } from "@ant-design/colors";
 
 const testy = new UIController();
 const { Header, Footer, Sider, Content } = Layout;
@@ -118,8 +118,8 @@ class App extends React.Component {
               <Button onClick={testy.getInputtedDSL}>Generate</Button>
             </Sider>
             <Content>Tree</Content>
-            <Sider style={{backgroundColor: blue[2]}}>
-              <List 
+            <Sider style={{ backgroundColor: blue[2] }}>
+              <List
                 header={<div>Header</div>}
                 footer={<div>Footer</div>}
                 bordered
