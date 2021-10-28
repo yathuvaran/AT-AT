@@ -54,7 +54,7 @@ export default class AttackTreeController {
           let metrics_map = this.verifyMetrics(second_split)
           //iterate over key, value pairs in metrics mapping
           for (const [key, value] of Object.entries(metrics_map)) {
-            output += ',' + '"' + key + '"' + ': ' + value 
+            output += ',' + '"' + key + '"' + ': ' + value
           }
           //output += ',"L":"True"';
           
@@ -78,7 +78,7 @@ export default class AttackTreeController {
 
     console.log(squareBrackets.length);
     console.log(curlyBraces.length);
-    var count = squareBrackets.length;
+    count = squareBrackets.length;
     for (i = 0; i < count; i++) {
       output += curlyBraces.pop();
       output += squareBrackets.pop();

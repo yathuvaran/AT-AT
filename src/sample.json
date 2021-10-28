@@ -1,0 +1,22 @@
+{
+  "name": "openSafe",
+  "operator": "OR",
+  "children": [
+    {
+      "name": "ForceOpen",
+      "operator": "OR",
+      "children": [
+        { "name": "Dynamite", "r": 0, "t": 0.1 },
+        { "name": "Throw Out Window" }
+      ]
+    },
+    {
+      "name": "Pick Lock",
+      "operator": "AND",
+      "children": [
+        { "name": "Insert Bobby Pin", "l": 0.9, "v": 0.3 },
+        { "name": "Pick With Bobby Pin", "l": 0.8 }
+      ]
+    }
+  ]
+}

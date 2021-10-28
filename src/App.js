@@ -8,12 +8,33 @@ import MenuBar from "./containers/MenuBar";
 import UIController from "./controllers/UIController";
 import { blue } from "@ant-design/colors";
 import * as d3 from "d3";
+import Tree from "react-d3-tree";
 
-const testy = new UIController();
+const tree_data = {
+  name: "openSafe",
+  operator: "OR",
+  children: [
+    {
+      name: "ForceOpen",
+      operator: "OR",
+      children: [
+        { name: "Dynamite", r: 0, t: 0.1 },
+        { name: "Throw Out Window" },
+      ],
+    },
+    {
+      name: "Pick Lock",
+      operator: "AND",
+      children: [
+        { name: "Insert Bobby Pin", l: 0.9, v: 0.3 },
+        { name: "Pick With Bobby Pin", l: 0.8 },
+      ],
+    },
+  ],
+};
+const uiController = new UIController();
 const { Header, Footer, Sider, Content } = Layout;
 const { TextArea } = Input;
-
-const testy2 = '1|"openSafe";"OR"\n2|"ForceOpen";"OR"\n3|"Dynamite";"OR"\n3|"Throw Out Window";"OR"\n2|"Pick Lock"; "AND"\n3|"Insert Bobby Pin";"OR"\n3|"Pick With Bobby Pin";"OR"'
 
 const { TabPane } = Tabs;
 
@@ -27,26 +48,28 @@ const data = [
 ];
 
 const initialPanes = [
-  { title: "Tab 1", content: "Content of Tab 1", key: "1" },
-  { title: "Tab 2", content: "Content of Tab 2", key: "2" },
-  {
-    title: "Tab 3",
-    content: "Content of Tab 3",
-    key: "3",
-    closable: false,
-  },
+  { title: "Tree 1", content: {}, key: 0},
 ];
 
 class App extends React.Component {
-  newTabIndex = 0;
+  newTabIndex = 1;
+  currentIndex = initialPanes[0].key
 
   state = {
     activeKey: initialPanes[0].key,
     panes: initialPanes,
   };
 
+  onClick = (activeKey) => {
+    console.log(this.currentIndex)
+  }
+
   onChange = (activeKey) => {
+    console.log(this.currentIndex, activeKey)
+    //save everything associated with current index to intitalPanes
+    this.currentIndex = activeKey
     this.setState({ activeKey });
+    console.log(this.currentIndex, activeKey)
   };
 
   onEdit = (targetKey, action) => {
@@ -55,11 +78,16 @@ class App extends React.Component {
 
   add = () => {
     const { panes } = this.state;
-    const activeKey = `newTab${this.newTabIndex++}`;
+    const activeKey = this.newTabIndex++;
     const newPanes = [...panes];
     newPanes.push({
       title: "New Tab",
-      content: "Content of new Tab",
+      content: {},
+      key: activeKey,
+    });
+    initialPanes.push({
+      title: "New Tab",
+      content: {},
       key: activeKey,
     });
     this.setState({
@@ -110,7 +138,6 @@ class App extends React.Component {
                   key={pane.key}
                   closable={pane.closable}
                 >
-                  {pane.content}
                 </TabPane>
               ))}
             </Tabs>
@@ -118,9 +145,11 @@ class App extends React.Component {
           <Layout>
             <Sider width={350}>
               <TextArea id="DSLTextBox" rows={25} />
-              <Button onClick={testy.getInputtedDSL}>Generate</Button>
+              <Button onClick={uiController.getInputtedDSL}>Generate</Button>
             </Sider>
-            <Content>Tree</Content>
+            <Content className="tree-container">
+              <Tree orientation="vertical" data={tree_data} />
+            </Content>
             <Sider style={{ backgroundColor: blue[2] }}>
               <List
                 header={<div>Header</div>}
