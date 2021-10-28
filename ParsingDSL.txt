@@ -3,7 +3,7 @@ Parsing DSL to JSON Logic
 // Logic for { brackets
 If (currentNumber <= numberFromPreviousLine) {
 	//stack popping math
-	abs((line - 1) - line) + 1
+	abs((prev_line_num) - curr_line_num) + 1
 
 	add {
 	// [] stack

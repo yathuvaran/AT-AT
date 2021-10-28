@@ -7,10 +7,13 @@ import { Tabs, Layout, Input, List, Button } from "antd";
 import MenuBar from "./containers/MenuBar";
 import UIController from "./controllers/UIController";
 import { blue } from "@ant-design/colors";
+import * as d3 from "d3";
 
 const testy = new UIController();
 const { Header, Footer, Sider, Content } = Layout;
 const { TextArea } = Input;
+
+const testy2 = '1|"openSafe";"OR"\n2|"ForceOpen";"OR"\n3|"Dynamite";"OR"\n3|"Throw Out Window";"OR"\n2|"Pick Lock"; "AND"\n3|"Insert Bobby Pin";"OR"\n3|"Pick With Bobby Pin";"OR"'
 
 const { TabPane } = Tabs;
 
