@@ -1,4 +1,31 @@
 import D3Test from "./D3Test";
+import React from "react";
+import ReactDOM from "react-dom";
+import Tree from "react-d3-tree";
+
+const tree_data = {
+  name: "openSafe",
+  operator: "OR",
+  children: [
+    {
+      name: "ForceOpen",
+      operator: "OR",
+      children: [
+        { name: "Dynamite", r: 0, t: 0.1 },
+        { name: "Throw Out Window" },
+      ],
+    },
+    {
+      name: "Pick Lock",
+      operator: "AND",
+      children: [
+        { name: "Insert Bobby Pin", l: 0.9, v: 0.3 },
+        { name: "Pick With Bobby Pin", l: 0.8 },
+      ],
+    },
+  ],
+};
+
 export default class AttackTreeController {
   parseDSL(text) {
     text = text.trim();
@@ -42,7 +69,6 @@ export default class AttackTreeController {
 
       output += "{";
       curlyBraces.push("}");
-      
 
       // Identifying leaf nodes:
       if (i < lines.length - 1) {
@@ -50,26 +76,24 @@ export default class AttackTreeController {
         var next_num = third_split[0];
         if (next_num <= curr_num) {
           //check for metrics
-          output += '"name":' + second_split[0] 
-          let metrics_map = this.verifyMetrics(second_split)
+          output += '"name":' + second_split[0];
+          let metrics_map = this.verifyMetrics(second_split);
           //iterate over key, value pairs in metrics mapping
           for (const [key, value] of Object.entries(metrics_map)) {
-            output += ',' + '"' + key + '"' + ': ' + value
+            output += "," + '"' + key + '"' + ": " + value;
           }
           //output += ',"L":"True"';
-          
-
+        } else {
+          output +=
+            '"name":' + second_split[0] + ',"operator":' + second_split[1];
         }
-        else {
-          output += '"name":' + second_split[0] + ',"operator":' + second_split[1];
-        }
-      } else  {
+      } else {
         //check for metrics
-        output += '"name":' + second_split[0] 
-        let metrics_map = this.verifyMetrics(second_split)
+        output += '"name":' + second_split[0];
+        let metrics_map = this.verifyMetrics(second_split);
         //iterate over key, value pairs in metrics mapping
         for (const [key, value] of Object.entries(metrics_map)) {
-          output += ',' + '"' + key + '"' + ': ' + value 
+          output += "," + '"' + key + '"' + ": " + value;
         }
       }
 
@@ -86,11 +110,18 @@ export default class AttackTreeController {
     console.log(squareBrackets);
     console.log(curlyBraces);
 
-    const d3Tree = new D3Test()
-    d3Tree.createD3(output)
-    console.log(output);
+    //remove child of tree container
+    while (ReactDOM.unmountComponentAtNode(document.getElementById("tree"))) {
+    }
+    // Delete children
 
-    
+    //put output instead of tree_data later
+    var tree_elem = React.createElement(Tree, {orientation:"vertical" ,data:tree_data})
+    ReactDOM.render(
+      tree_elem,
+      document.getElementById('tree')
+    )
+    console.log(output);
   }
 
   splitDSL(text) {
@@ -100,17 +131,16 @@ export default class AttackTreeController {
     return [first_split, second_split];
   }
 
-  verifyMetrics(metrics){
-    var output = {}
-    //case where only name is provided 
-    if (metrics.length === 1){
-      return output
+  verifyMetrics(metrics) {
+    var output = {};
+    //case where only name is provided
+    if (metrics.length === 1) {
+      return output;
     }
-    for (var i = 1; i < metrics.length; i++){
-      var key_val = metrics[i].split("=")
-      output[key_val[0]] = key_val[1]
+    for (var i = 1; i < metrics.length; i++) {
+      var key_val = metrics[i].split("=");
+      output[key_val[0]] = key_val[1];
     }
     return output
   }
-
 }

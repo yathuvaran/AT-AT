@@ -3,13 +3,16 @@ import { Tabs, Layout, Input, Button } from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
 import Tree from "react-d3-tree";
+import ReactDOM from "react-dom";
 
 const { TabPane } = Tabs;
 const { Header, Footer, Sider, Content } = Layout;
 const { TextArea } = Input;
 const uiController = new UIController();
 
-var currentPanes = [{ title: "Tab 1", content: {}, key: "0" }];
+var currentPanes = [
+  { title: "New Tab 0", content: { tree: {}, dsl: "" }, key: "0", closable: false },
+];
 
 var tree_data = {
   name: "openSafe",
@@ -43,11 +46,13 @@ class App extends React.Component {
       activeKey: currentPanes[0].key,
       panes: currentPanes,
       TextArea: "",
+      treeData: {name: ''},
     };
     this.handleChange = this.handleChange.bind(this);
   }
 
   onChange = (activeKey) => {
+     console.log('heelo') 
     //save everything associated with current index to intitalPanes
     for (var i = 0; i < currentPanes.length; i++) {
       console.log("indexKey: ", currentPanes[i].key);
@@ -60,9 +65,23 @@ class App extends React.Component {
     }
     //active key is our target key
     this.currentIndex = activeKey;
-
     console.log(currentPanes);
-    this.setState({ activeKey, TextArea: currentPanes[activeKey].content.dsl });
+    var activeKeyIndex = 0
+    for(i = 0; i < currentPanes.length; i++){
+        if (currentPanes[i].key === activeKey){
+            activeKeyIndex = i
+        }
+    }
+
+    //destroy tree
+    while (ReactDOM.unmountComponentAtNode(document.getElementById("tree"))) {
+      console.log("testy");
+    }
+
+    
+
+
+    this.setState({ activeKey, TextArea: currentPanes[activeKeyIndex].content.dsl });
   };
 
   onEdit = (targetKey, action) => {
@@ -70,23 +89,28 @@ class App extends React.Component {
   };
 
   add = () => {
+    console.log('cheese')
     const { panes } = this.state;
     const activeKey = `${this.newTabIndex++}`;
     const newPanes = [...panes];
     newPanes.push({
-      title: "New Tab" + activeKey,
+      title: "New Tab " + activeKey,
       content: "Content of new Tab",
       key: activeKey,
     });
     currentPanes.push({
       title: "New Tab" + activeKey,
-      content: { tree: "", dsl: "" },
+      content: { tree: {name: ''}, dsl: "" },
       key: activeKey,
     });
+    for (var i = 0; i < newPanes.length; i++) {
+      newPanes[i].closable = true;
+    }
     this.setState({
       panes: newPanes,
       activeKey,
     });
+    this.onChange(activeKey)
   };
 
   remove = (targetKey) => {
@@ -106,6 +130,8 @@ class App extends React.Component {
         newActiveKey = newPanes[0].key;
       }
     }
+    this.onChange(newActiveKey)
+
     console.log("target", targetKey);
     currentPanes = currentPanes.filter((pane) => pane.key !== targetKey);
     //const currentPanes = panes.filter((pane) => pane.key !== targetKey);
@@ -116,23 +142,30 @@ class App extends React.Component {
     //     newActiveKey = currentPanes[0].key;
     //   }
     // }
-    if (currentPanes.length === 0) {
-        this.setState({
-            panes: newPanes,
-            activeKey: newActiveKey,
-            TextArea: '',
-          });
-    } else {
-      this.setState({
-        panes: newPanes,
-        activeKey: newActiveKey,
-        TextArea: currentPanes[newActiveKey].content.dsl,
-      });
+    var activeKeyIndex = 0
+    for(var i = 0; i < currentPanes.length; i++){
+        if (currentPanes[i].key === activeKey){
+            activeKeyIndex = i
+        }
+    }
+    console.log("newActiveKey", newActiveKey);
+    console.log(currentPanes);
+    
+    this.setState({
+      panes: newPanes,
+      activeKey: newActiveKey,
+    });
+    if (currentPanes.length === 1) {
+      newPanes[0].closable = false;
     }
   };
 
   handleChange(event) {
     this.setState({ TextArea: event.target.value });
+  }
+
+  treeChange(event){
+    this.setState({treeData: event.target.data})
   }
 
   render() {
@@ -163,8 +196,8 @@ class App extends React.Component {
             />
             <Button onClick={uiController.getInputtedDSL}>Generate</Button>
           </Sider>
-          <Content className="tree-container">
-            <Tree orientation="vertical" data={tree_data} />
+          <Content id='tree'>
+            <Tree onChange={this.treeChange} orientation="vertical" data={{name: ''}} />
           </Content>
         </Layout>
       </div>
