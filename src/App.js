@@ -1,16 +1,17 @@
 import React from "react";
-import ReactDOM from "react-dom";
-import logo from "./logo.svg";
+import { Tabs, Layout, Input, Button } from "antd";
 import "antd/dist/antd.css";
-import "./index.css";
-import { Tabs, Layout, Input, List, Button } from "antd";
-import MenuBar from "./containers/MenuBar";
 import UIController from "./controllers/UIController";
-import { blue } from "@ant-design/colors";
-import * as d3 from "d3";
 import Tree from "react-d3-tree";
 
-const tree_data = {
+const { TabPane } = Tabs;
+const { Header, Footer, Sider, Content } = Layout;
+const { TextArea } = Input;
+const uiController = new UIController();
+
+var currentPanes = [{ title: "Tab 1", content: {}, key: "0" }];
+
+var tree_data = {
   name: "openSafe",
   operator: "OR",
   children: [
@@ -32,44 +33,36 @@ const tree_data = {
     },
   ],
 };
-const uiController = new UIController();
-const { Header, Footer, Sider, Content } = Layout;
-const { TextArea } = Input;
-
-const { TabPane } = Tabs;
-
-const data = [
-  "Scenario 1",
-  "Scenario 2",
-  "Scenario 3",
-  "Scenario 4",
-  "Scenario 5",
-  "Scenario 6",
-];
-
-const initialPanes = [
-  { title: "Tree 1", content: {}, key: 0},
-];
 
 class App extends React.Component {
   newTabIndex = 1;
-  currentIndex = initialPanes[0].key
-
-  state = {
-    activeKey: initialPanes[0].key,
-    panes: initialPanes,
-  };
-
-  onClick = (activeKey) => {
-    console.log(this.currentIndex)
+  currentIndex = currentPanes[0].key;
+  constructor(props) {
+    super(props);
+    this.state = {
+      activeKey: currentPanes[0].key,
+      panes: currentPanes,
+      TextArea: "",
+    };
+    this.handleChange = this.handleChange.bind(this);
   }
 
   onChange = (activeKey) => {
-    console.log(this.currentIndex, activeKey)
     //save everything associated with current index to intitalPanes
-    this.currentIndex = activeKey
-    this.setState({ activeKey });
-    console.log(this.currentIndex, activeKey)
+    for (var i = 0; i < currentPanes.length; i++) {
+      console.log("indexKey: ", currentPanes[i].key);
+      console.log("currentIndex: ", this.currentIndex);
+      if (currentPanes[i].key === this.currentIndex) {
+        currentPanes[i]["content"]["tree"] = tree_data;
+        currentPanes[i]["content"]["dsl"] =
+          document.getElementById("DSLTextBox").value;
+      }
+    }
+    //active key is our target key
+    this.currentIndex = activeKey;
+
+    console.log(currentPanes);
+    this.setState({ activeKey, TextArea: currentPanes[activeKey].content.dsl });
   };
 
   onEdit = (targetKey, action) => {
@@ -78,16 +71,16 @@ class App extends React.Component {
 
   add = () => {
     const { panes } = this.state;
-    const activeKey = this.newTabIndex++;
+    const activeKey = `${this.newTabIndex++}`;
     const newPanes = [...panes];
     newPanes.push({
-      title: "New Tab",
-      content: {},
+      title: "New Tab" + activeKey,
+      content: "Content of new Tab",
       key: activeKey,
     });
-    initialPanes.push({
-      title: "New Tab",
-      content: {},
+    currentPanes.push({
+      title: "New Tab" + activeKey,
+      content: { tree: "", dsl: "" },
       key: activeKey,
     });
     this.setState({
@@ -113,54 +106,66 @@ class App extends React.Component {
         newActiveKey = newPanes[0].key;
       }
     }
-    this.setState({
-      panes: newPanes,
-      activeKey: newActiveKey,
-    });
+    console.log("target", targetKey);
+    currentPanes = currentPanes.filter((pane) => pane.key !== targetKey);
+    //const currentPanes = panes.filter((pane) => pane.key !== targetKey);
+    // if (currentPanes.length && newActiveKey === targetKey) {
+    //   if (lastIndex >= 0) {
+    //     newActiveKey = currentPanes[lastIndex].key;
+    //   } else {
+    //     newActiveKey = currentPanes[0].key;
+    //   }
+    // }
+    if (currentPanes.length === 0) {
+        this.setState({
+            panes: newPanes,
+            activeKey: newActiveKey,
+            TextArea: '',
+          });
+    } else {
+      this.setState({
+        panes: newPanes,
+        activeKey: newActiveKey,
+        TextArea: currentPanes[newActiveKey].content.dsl,
+      });
+    }
   };
+
+  handleChange(event) {
+    this.setState({ TextArea: event.target.value });
+  }
 
   render() {
     const { panes, activeKey } = this.state;
     return (
       <div>
+        <Tabs
+          type="editable-card"
+          onChange={this.onChange}
+          activeKey={activeKey}
+          onEdit={this.onEdit}
+        >
+          {panes.map((pane) => (
+            <TabPane
+              tab={pane.title}
+              key={pane.key}
+              closable={pane.closable}
+            ></TabPane>
+          ))}
+        </Tabs>
         <Layout>
-          <MenuBar></MenuBar>
-          <Header>
-            <Tabs
-              type="editable-card"
-              onChange={this.onChange}
-              activeKey={activeKey}
-              onEdit={this.onEdit}
-            >
-              {panes.map((pane) => (
-                <TabPane
-                  tab={pane.title}
-                  key={pane.key}
-                  closable={pane.closable}
-                >
-                </TabPane>
-              ))}
-            </Tabs>
-          </Header>
-          <Layout>
-            <Sider width={350}>
-              <TextArea id="DSLTextBox" rows={25} />
-              <Button onClick={uiController.getInputtedDSL}>Generate</Button>
-            </Sider>
-            <Content className="tree-container">
-              <Tree orientation="vertical" data={tree_data} />
-            </Content>
-            <Sider style={{ backgroundColor: blue[2] }}>
-              <List
-                header={<div>Header</div>}
-                footer={<div>Footer</div>}
-                bordered
-                dataSource={data}
-                renderItem={(item) => <List.Item>{item}</List.Item>}
-              />
-            </Sider>
-          </Layout>
-          <Footer>Footer</Footer>
+          <Sider width={350}>
+            <TextArea
+              value={this.state.TextArea}
+              onChange={this.handleChange}
+              id="DSLTextBox"
+              rows={25}
+            />
+            <Button onClick={uiController.getInputtedDSL}>Generate</Button>
+          </Sider>
+          <Content className="tree-container">
+            <Tree orientation="vertical" data={tree_data} />
+          </Content>
         </Layout>
       </div>
     );
