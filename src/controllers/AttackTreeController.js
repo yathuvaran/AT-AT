@@ -1,30 +1,7 @@
-import D3Test from "./D3Test";
 import React from "react";
 import ReactDOM from "react-dom";
 import Tree from "react-d3-tree";
-
-const tree_data = {
-  name: "openSafe",
-  operator: "OR",
-  children: [
-    {
-      name: "ForceOpen",
-      operator: "OR",
-      children: [
-        { name: "Dynamite", r: 0, t: 0.1 },
-        { name: "Throw Out Window" },
-      ],
-    },
-    {
-      name: "Pick Lock",
-      operator: "AND",
-      children: [
-        { name: "Insert Bobby Pin", l: 0.9, v: 0.3 },
-        { name: "Pick With Bobby Pin", l: 0.8 },
-      ],
-    },
-  ],
-};
+import App from "../App";
 
 export default class AttackTreeController {
   parseDSL(text) {
@@ -107,21 +84,14 @@ export default class AttackTreeController {
       output += curlyBraces.pop();
       output += squareBrackets.pop();
     }
-    console.log(squareBrackets);
-    console.log(curlyBraces);
-
-    //remove child of tree container
-    while (ReactDOM.unmountComponentAtNode(document.getElementById("tree"))) {
-    }
-    // Delete children
 
     //put output instead of tree_data later
-    var tree_elem = React.createElement(Tree, {orientation:"vertical" ,data:tree_data})
-    ReactDOM.render(
-      tree_elem,
-      document.getElementById('tree')
-    )
-    console.log(output);
+    // var tree_elem = React.createElement(Tree, {orientation:"vertical" ,data:tree_data})
+    // ReactDOM.render(
+    //   tree_elem,
+    //   document.getElementById('tree')
+    // )
+    Window.map.setTreeData(output.substring(1,output.length - 1))
   }
 
   splitDSL(text) {
