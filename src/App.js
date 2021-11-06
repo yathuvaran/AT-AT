@@ -34,7 +34,7 @@ class App extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
-  componentDidMount(){
+  componentDidMount() {
     Window.map = this;
   }
 
@@ -67,7 +67,7 @@ class App extends React.Component {
     this.setState({
       activeKey,
       TextArea: currentPanes[activeKeyIndex].content.dsl,
-      treeData: currentPanes[activeKeyIndex].content.tree
+      treeData: currentPanes[activeKeyIndex].content.tree,
     });
   };
 
@@ -151,8 +151,8 @@ class App extends React.Component {
     this.setState({ TextArea: event.target.value });
   }
 
-  setTreeData(sentData){
-    this.setState({treeData: JSON.parse(sentData)})
+  setTreeData(sentData) {
+    this.setState({ treeData: JSON.parse(sentData) });
   }
 
   render() {
@@ -180,10 +180,13 @@ class App extends React.Component {
               onChange={this.handleChange}
               id="DSLTextBox"
               rows={25}
+              style={{whiteSpace: "nowrap"}}
             />
             <Button onClick={uiController.getInputtedDSL}>Generate</Button>
           </Sider>
-          <Content id='tree'><D3Tree data={this.state.treeData}/></Content>
+          <Content id="tree">
+            <D3Tree data={this.state.treeData} />
+          </Content>
         </Layout>
       </div>
     );
