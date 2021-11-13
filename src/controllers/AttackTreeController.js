@@ -1,6 +1,22 @@
 export default class AttackTreeController {
   patternMatch(text) {
     // TODO: Fix regex variable name to something like leafRegex.
+    // new pattern matcher 
+    // const regex =  /^(\t*[\W|\w|\s]+)$/g;
+
+    //split second half of line to get node name stuff
+    // const str = '		 	~12`*	adwasd	hello';
+
+    // var words = str.split(/^\t*/g);
+    // console.log(words);
+
+    //counting number of tabs before our node name starts
+    // var numOfTabs = 0;
+    // var start = 0;
+    // while ( str.charAt( start++ ) == "\t" ) numOfTabs++;
+    // console.log(numOfTabs)
+
+
     const regex = /^([1-9]|([1-9][0-9]+))\|\w+/g;
     if (text.match(regex) == null) {
       // TODO: Change return?
@@ -106,13 +122,11 @@ export default class AttackTreeController {
 
     for (i = 1; i < lines.length; i++) {
       var prev_num = prev_split[0];
-      console.log(prev_num);
       if (!this.patternVerify(lines[i], prev_num, prevLineType)[0]) {
         console.log(lines[i]);
         return;
         // stop execution
       }
-      console.log("we out");
 
       var first_split = lines[i].split("|");
       var curr_num = first_split[0];
