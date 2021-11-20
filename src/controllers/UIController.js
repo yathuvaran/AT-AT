@@ -4,8 +4,9 @@ export default class UIController {
   
   getInputtedDSL() {
     const attackTreeController = new AttackTreeController();
+    console.log(Window.map.getTextAreaValue())
     attackTreeController.parseDSL(
-      document.getElementById("DSLTextBox").value
+      Window.map.getTextAreaValue()
     );
   }
 

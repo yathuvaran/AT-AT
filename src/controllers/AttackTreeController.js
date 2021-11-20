@@ -15,35 +15,52 @@ export default class AttackTreeController {
     // var start = 0;
     // while ( str.charAt( start++ ) == "\t" ) numOfTabs++;
     // console.log(numOfTabs)
+    // TODO: Convert all variables to camelCase.
 
-
-    const regex = /^([1-9]|([1-9][0-9]+))\|\w+/g;
-    if (text.match(regex) == null) {
-      // TODO: Change return?
-      console.log("must have num|text");
-      return [false, "must have num|text"];
+    // D3 library also sanitizes input (e.g., won't allow tabs).
+    // Old regex = /^([1-9]|([1-9][0-9]+))\|\w+/g
+    const regex = /^(\t*[\W|\w|\s]+)$/g;
+    var str = text.match(regex);
+    if (str == null || this.getLineText(str[0]).includes("\t")) {
+      console.log("must have \"tab text\"");
+      return [false, "Format Error","must have \"tab text\""];
     }
     return [true];
   }
 
-  patternVerify(text, prev_num, prevLineType) {
-    let pipeSplit = text.split("|");
-    if (!(pipeSplit[0] > 1 && pipeSplit[0] <= parseInt(prev_num, 10) + 1)) {
+  calcNumberOfTabs(line) {
+    var numOfTabs = 0;
+    var start = 0;
+    while ( line.charAt( start++ ) === "\t" ) numOfTabs++;
+    console.log(numOfTabs)
+    return numOfTabs + 1
+  }
+
+  getLineText(line) {
+    var words = line.split(/^\t*/g);
+    if (words.length === 1){
+      return words[0]
+    }
+    return words[1]
+  }
+
+  patternVerify(curr_num, prev_num, prevLineType) {
+    //let pipeSplit = text.split("|");
+    if (!(curr_num > 1 && curr_num <= parseInt(prev_num, 10) + 1)) {
       console.log(
         "num must be in range 2...prevnum + 1",
-        pipeSplit[0],
+        curr_num,
         prev_num + 1,
         prevLineType
       );
-      return [false, "num must be in range 2...prevnum + 1"];
+      return [false, "Verification Error", "num must be in range 2...prevnum + 1"];
     }
 
-    var curr_num = pipeSplit[0];
-    //check if prev line was a node, then curr_num must be greater
+    //check if prev line was a node, then currNum must be greater
     if (prevLineType === "Node") {
       if (!(curr_num > prev_num)) {
         console.log("node cannot");
-        return [false, "node cannot"];
+        return [false, "Verifcation Error","node cannot"];
       }
     }
 
@@ -51,7 +68,7 @@ export default class AttackTreeController {
     if (prevLineType === "Leaf") {
       if (!(curr_num <= prev_num)) {
         console.log("leaf cannot");
-        return [false, "leaf cannot"];
+        return [false, "Verification Error","leaf cannot"];
       }
     }
 
@@ -63,8 +80,9 @@ export default class AttackTreeController {
     var output = "";
     var lines = text.split("\n");
     for (var i = 0; i < lines.length; i++) {
-      if (this.patternMatch(lines[i])[0] === false) {
-        console.log("send pop up indicate line #");
+      var result = this.patternMatch(lines[i])
+      if (result[0] === false) {
+        Window.map.openNotificationWithIcon('error', result[1], result[2])
         return;
         // stop execution
       }
@@ -75,13 +93,17 @@ export default class AttackTreeController {
     var curlyBraces = [];
 
     // initally first line
-    var prev_split = lines[0].split("|");
-    var second_split = prev_split[1].split(";");
+    //str.split(/^\t*/g)
+    //var prevLineNum = lines[0].split("|");
+    // The number of tabs is really the depth level.
+    var prevLineNum = this.calcNumberOfTabs(lines[0])
+    
 
-    if (prev_split[0] != 1) {
+    if (prevLineNum !== 1) {
       console.log("Should start with a 1");
       return;
     }
+    var second_split = this.getLineText(lines[0]).split(";");
 
     if (lines.length === 1) {
       //must be leaf
@@ -102,8 +124,8 @@ export default class AttackTreeController {
     } else {
       //must be node
       const regex = /\w+;(OR|AND)$/g;
-      if (prev_split[1].match(regex) === null) {
-        console.log(lines[i]);
+      if (this.getLineText(lines[0]).match(regex) === null) {
+        //console.log(lines[i]);
         console.log("Node syntax bad");
         return;
         // stop execution
@@ -120,17 +142,21 @@ export default class AttackTreeController {
 
     var prevLineType = "Node";
 
+    var curr_num;
+    var prev_num;
     for (i = 1; i < lines.length; i++) {
-      var prev_num = prev_split[0];
-      if (!this.patternVerify(lines[i], prev_num, prevLineType)[0]) {
+      prev_num = prevLineNum;
+      curr_num = this.calcNumberOfTabs(lines[i])
+      var result = this.patternVerify(curr_num, prev_num, prevLineType)
+      if (!result[0]) {
+        Window.map.openNotificationWithIcon('error', result[1], result[2])
         console.log(lines[i]);
         return;
         // stop execution
       }
 
-      var first_split = lines[i].split("|");
-      var curr_num = first_split[0];
-      var second_split = first_split[1].split(";");
+      // var first_split = lines[i].split("|");
+      second_split = this.getLineText(lines[i]).split(";");
 
       // if curr node is not a neighbor to previous node
       // or is a level above the previous node
@@ -156,8 +182,8 @@ export default class AttackTreeController {
 
       // Identifying leaf nodes:
       if (i < lines.length - 1) {
-        var third_split = lines[i + 1].split("|");
-        var next_num = third_split[0];
+        //var third_split = lines[i + 1].split("|");
+        var next_num = this.calcNumberOfTabs(lines[i+1])
         if (next_num <= curr_num) {
           prevLineType = "Leaf";
           //verify metrics before
@@ -178,7 +204,9 @@ export default class AttackTreeController {
           prevLineType = "Node";
           // verify node snytax
           const regex = /\w+;(OR|AND)$/g;
-          if (first_split[1].match(regex) === null) {
+          // the actual text for the node for the current line
+          // Get the unsplit version of the actual text.
+          if (this.getLineText(lines[i]).match(regex) === null) {
             console.log(lines[i]);
             console.log("Node syntax bad");
             return;
@@ -206,7 +234,7 @@ export default class AttackTreeController {
         }
       }
 
-      prev_split = first_split;
+      prevLineNum = curr_num;
     }
 
     console.log(squareBrackets.length);
@@ -234,6 +262,7 @@ export default class AttackTreeController {
 
   verifyMetrics(metrics) {
     var set = new Set();
+    // Regex to ensure metrics are properly formatted.
     const regex = /^\w=(1\.0|[0]\.\d|[0-1])$/g;
     for (var i = 1; i < metrics.length; i++) {
       //check for proper syntax

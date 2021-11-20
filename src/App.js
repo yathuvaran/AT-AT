@@ -1,10 +1,12 @@
 import React from "react";
-import { Tabs, Layout, Input, Button } from "antd";
+import { Tabs, Layout, Input, Button, notification, Space } from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
 import ReactDOM from "react-dom";
 import D3Tree from "./D3Tree";
 import { active } from "d3-transition";
+import { UnControlled as CodeMirror } from "react-codemirror2";
+import 'codemirror/lib/codemirror.css';
 
 const { TabPane } = Tabs;
 const { Header, Footer, Sider, Content } = Layout;
@@ -31,26 +33,33 @@ class App extends React.Component {
       TextArea: "",
       treeData: { name: "" },
     };
-    this.handleChange = this.handleChange.bind(this);
   }
+
+  openNotificationWithIcon = (type, title, desc) => {
+    notification[type]({
+      message: title,
+      description: desc,
+    });
+  };
 
   componentDidMount() {
     Window.map = this;
-    var textareas = document.getElementsByTagName("textarea");
-    var count = textareas.length;
-    for (var i = 0; i < count; i++) {
-      textareas[i].onkeydown = function (e) {
-        if (e.keyCode == 9 || e.which == 9) {
-          e.preventDefault();
-          var s = this.selectionStart;
-          this.value =
-            this.value.substring(0, this.selectionStart) +
-            "\t" +
-            this.value.substring(this.selectionEnd);
-          this.selectionEnd = s + 1;
-        }
-      };
-    }
+    //var textareas = document.getElementsByTagName("textarea");
+    //var count = textareas.length;
+    // TODO: Delete hacky code.
+    // for (var i = 0; i < count; i++) {
+    //   textareas[i].onkeydown = function (e) {
+    //     if (e.keyCode == 9 || e.which == 9) {
+    //       e.preventDefault();
+    //       var s = this.selectionStart;
+    //       this.value =
+    //         this.value.substring(0, this.selectionStart) +
+    //         "\t" +
+    //         this.value.substring(this.selectionEnd);
+    //       this.selectionEnd = s + 1;
+    //     }
+    //   };
+    // }
   }
 
   onChange = (activeKey) => {
@@ -162,12 +171,12 @@ class App extends React.Component {
     }
   };
 
-  handleChange(event) {
-    this.setState({ TextArea: event.target.value });
-  }
-
   setTreeData(sentData) {
     this.setState({ treeData: JSON.parse(sentData) });
+  }
+
+  getTextAreaValue(){
+    return this.state.TextArea
   }
 
   render() {
@@ -190,12 +199,15 @@ class App extends React.Component {
         </Tabs>
         <Layout>
           <Sider width={350}>
-            <TextArea
+            <CodeMirror
               value={this.state.TextArea}
-              onChange={this.handleChange}
-              id="DSLTextBox"
-              rows={25}
-              style={{ fontFamily: "Monaco", whiteSpace: "nowrap" }}
+              options={{
+                mode: "xml",
+                lineNumbers: true,
+              }}
+              onChange={(editor, data, value) => {
+                this.setState({value});
+              }}
             />
             <Button onClick={uiController.getInputtedDSL}>Generate</Button>
           </Sider>
