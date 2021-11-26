@@ -6,11 +6,11 @@ import ReactDOM from "react-dom";
 import D3Tree from "./D3Tree";
 import { active } from "d3-transition";
 import { UnControlled as CodeMirror } from "react-codemirror2";
-import 'codemirror/lib/codemirror.css';
+import "codemirror/lib/codemirror.css";
 
 const { TabPane } = Tabs;
 const { Header, Footer, Sider, Content } = Layout;
-const { TextArea } = Input;
+
 const uiController = new UIController();
 
 var currentPanes = [
@@ -27,6 +27,7 @@ class App extends React.Component {
   currentIndex = currentPanes[0].key;
   constructor(props) {
     super(props);
+    this.instance = null;
     this.state = {
       activeKey: currentPanes[0].key,
       panes: currentPanes,
@@ -44,6 +45,7 @@ class App extends React.Component {
 
   componentDidMount() {
     Window.map = this;
+    //this code is cursed
     //var textareas = document.getElementsByTagName("textarea");
     //var count = textareas.length;
     // TODO: Delete hacky code.
@@ -175,12 +177,16 @@ class App extends React.Component {
     this.setState({ treeData: JSON.parse(sentData) });
   }
 
-  getTextAreaValue(){
-    return this.state.TextArea
+  getTextAreaValue() {
+    return this.state.TextArea;
   }
 
   render() {
     const { panes, activeKey } = this.state;
+    if (this.instance != null){
+      console.log(this.instance)
+      console.log(this.instance.getValue())
+    }
     return (
       <div>
         <Tabs
@@ -200,13 +206,16 @@ class App extends React.Component {
         <Layout>
           <Sider width={350}>
             <CodeMirror
-              value={this.state.TextArea}
+              editorDidMount={(editor) => {
+                this.instance = editor;
+              }}
               options={{
                 mode: "xml",
                 lineNumbers: true,
+                indentWithTabs: true,
               }}
               onChange={(editor, data, value) => {
-                this.setState({value});
+                this.setState({ TextArea:value });
               }}
             />
             <Button onClick={uiController.getInputtedDSL}>Generate</Button>
