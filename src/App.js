@@ -5,6 +5,8 @@ import UIController from "./controllers/UIController";
 import D3Tree from "./D3Tree";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
+// Keep this import here just in case.
+// Used for internal themes.
 // import "codemirror/theme/material-darker.css";
 const { TabPane } = Tabs;
 const {Sider, Content } = Layout;
