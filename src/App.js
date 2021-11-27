@@ -1,21 +1,21 @@
 import React from "react";
-import { Tabs, Layout, Input, Button, notification, Space } from "antd";
+import { Tabs, Layout, Button, notification} from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
-import ReactDOM from "react-dom";
 import D3Tree from "./D3Tree";
-import { active } from "d3-transition";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
-
+// import "codemirror/theme/material-darker.css";
 const { TabPane } = Tabs;
-const { Header, Footer, Sider, Content } = Layout;
+const {Sider, Content } = Layout;
 
 const uiController = new UIController();
 
+// Initialize the current panes.
 var currentPanes = [
   {
     title: "New Tab 0",
+    // Initialize the tree to be an empty object and the dsl to empty string.
     content: { tree: {}, dsl: "" },
     key: "0",
     closable: false,
@@ -24,6 +24,7 @@ var currentPanes = [
 
 class App extends React.Component {
   newTabIndex = 1;
+  // Initialize the currentIndex to be the first pane key.
   currentIndex = currentPanes[0].key;
   constructor(props) {
     super(props);
@@ -31,39 +32,39 @@ class App extends React.Component {
     this.state = {
       activeKey: currentPanes[0].key,
       panes: currentPanes,
-      TextArea: "",
       treeData: { name: "" },
     };
   }
 
+  /**
+   * Open a notification with an icon.
+   * @param {string} type A type of notification.
+   * @param {string} title A title for a notification.
+   * @param {string} desc A description for a notification.
+   */
   openNotificationWithIcon = (type, title, desc) => {
     notification[type]({
+      style: {
+        whiteSpace: "pre",
+      },
       message: title,
       description: desc,
     });
   };
 
+  /**
+   * When a component mounts on the DOM object.
+   */
   componentDidMount() {
+    // Set the size to width 350 and height 650.
+    this.instance.setSize(350, 650);
     Window.map = this;
-    //this code is cursed
-    //var textareas = document.getElementsByTagName("textarea");
-    //var count = textareas.length;
-    // TODO: Delete hacky code.
-    // for (var i = 0; i < count; i++) {
-    //   textareas[i].onkeydown = function (e) {
-    //     if (e.keyCode == 9 || e.which == 9) {
-    //       e.preventDefault();
-    //       var s = this.selectionStart;
-    //       this.value =
-    //         this.value.substring(0, this.selectionStart) +
-    //         "\t" +
-    //         this.value.substring(this.selectionEnd);
-    //       this.selectionEnd = s + 1;
-    //     }
-    //   };
-    // }
   }
 
+  /**
+   * On a change given an activeKey.
+   * @param {number} activeKey An active key value.
+   */
   onChange = (activeKey) => {
     // Save everything associated with current index to currentPanes.
     for (var i = 0; i < currentPanes.length; i++) {
@@ -73,8 +74,7 @@ class App extends React.Component {
       if (currentPanes[i].key === this.currentIndex) {
         // Save the tree data and dsl at the current index.
         currentPanes[i]["content"]["tree"] = this.state.treeData;
-        currentPanes[i]["content"]["dsl"] =
-          document.getElementById("DSLTextBox").value;
+        currentPanes[i]["content"]["dsl"] = this.instance.getValue();
       }
     }
     // Active key is our target key.
@@ -89,23 +89,35 @@ class App extends React.Component {
         activeKeyIndex = i;
       }
     }
-
+    // Set the activeKey, and treeData.
     this.setState({
       activeKey,
-      TextArea: currentPanes[activeKeyIndex].content.dsl,
+      // TreeData should be updated to the current panes at the activeKeyIndex.
       treeData: currentPanes[activeKeyIndex].content.tree,
     });
+    // Set the text content to be DSL of currentPanes at the activeKeyIndex.
+    this.instance.setValue(currentPanes[activeKeyIndex].content.dsl)
   };
 
+  /**
+   * On an edit given a targetKey and an action.
+   * @param {number} targetKey An active key value.
+   * @param {number} action An active key value.
+   */
   onEdit = (targetKey, action) => {
     this[action](targetKey);
   };
 
+  /**
+   * Adding a new tab.
+   */
   add = () => {
-    console.log("cheese");
     const { panes } = this.state;
+    // Declare the activeKey to be the incremented tab index.
     const activeKey = `${this.newTabIndex++}`;
+    // Spread syntax.
     const newPanes = [...panes];
+    // Add a new tab to newPanes.
     newPanes.push({
       title: "New Tab " + activeKey,
       content: "Content of new Tab",
@@ -116,6 +128,8 @@ class App extends React.Component {
       content: { tree: { name: "" }, dsl: "" },
       key: activeKey,
     });
+    // Iterate across newPanes and set each pane to closable.
+    // This is because if we have multiple tabs, they should all be closable.
     for (var i = 0; i < newPanes.length; i++) {
       newPanes[i].closable = true;
     }
@@ -126,48 +140,48 @@ class App extends React.Component {
     this.onChange(activeKey);
   };
 
+  /**
+   * Removing a tab.
+   * @param {number} targetKey A target key number for the pane to be removed.
+   */
   remove = (targetKey) => {
+    // Get the panes and activeKey from this state.
     const { panes, activeKey } = this.state;
     let newActiveKey = activeKey;
     let lastIndex;
+    // Iterate across each pane and index.
     panes.forEach((pane, i) => {
+      // If the pane's key matches the target key, it is the pane to remove.
       if (pane.key === targetKey) {
+        // Decrement the last index to move to the previous tab.
         lastIndex = i - 1;
       }
     });
+    // Create a newPanes collection that includes all but the removed pane.
     const newPanes = panes.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && newActiveKey === targetKey) {
       if (lastIndex >= 0) {
         newActiveKey = newPanes[lastIndex].key;
+        // If we deleted the first tab.
       } else {
+        // Set the newActiveKey to be the new first tab.
         newActiveKey = newPanes[0].key;
       }
     }
     this.onChange(newActiveKey);
 
     console.log("target", targetKey);
+    // Remove the target pane from the current panes.
     currentPanes = currentPanes.filter((pane) => pane.key !== targetKey);
-    //const currentPanes = panes.filter((pane) => pane.key !== targetKey);
-    // if (currentPanes.length && newActiveKey === targetKey) {
-    //   if (lastIndex >= 0) {
-    //     newActiveKey = currentPanes[lastIndex].key;
-    //   } else {
-    //     newActiveKey = currentPanes[0].key;
-    //   }
-    // }
-    var activeKeyIndex = 0;
-    for (var i = 0; i < currentPanes.length; i++) {
-      if (currentPanes[i].key === activeKey) {
-        activeKeyIndex = i;
-      }
-    }
     console.log("newActiveKey", newActiveKey);
     console.log(currentPanes);
-
     this.setState({
+      // Set the panes to be the newPanes.
       panes: newPanes,
+      // Set the activeKey to be the newActive
       activeKey: newActiveKey,
     });
+    // If only one pain remaining, set closable to false.
     if (currentPanes.length === 1) {
       newPanes[0].closable = false;
     }
@@ -178,14 +192,13 @@ class App extends React.Component {
   }
 
   getTextAreaValue() {
-    return this.state.TextArea;
+    return this.instance.getValue();
   }
 
   render() {
     const { panes, activeKey } = this.state;
-    if (this.instance != null){
-      console.log(this.instance)
-      console.log(this.instance.getValue())
+    if (this.instance != null) {
+      
     }
     return (
       <div>
@@ -210,15 +223,16 @@ class App extends React.Component {
                 this.instance = editor;
               }}
               options={{
-                mode: "xml",
+                mode: null,
                 lineNumbers: true,
                 indentWithTabs: true,
-              }}
-              onChange={(editor, data, value) => {
-                this.setState({ TextArea:value });
+                viewportMargin: 20,
+                indentUnit: 4
               }}
             />
+            <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
             <Button onClick={uiController.getInputtedDSL}>Generate</Button>
+            </div>
           </Sider>
           <Content id="tree">
             <D3Tree data={this.state.treeData} />
