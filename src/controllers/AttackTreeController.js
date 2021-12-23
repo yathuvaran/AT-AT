@@ -1,3 +1,5 @@
+import TreeAnalyzerController from "./TreeAnalyzerController";
+
 export default class AttackTreeController {
   patternMatch(text) {
     // D3 library also sanitizes input (e.g., won't allow tabs, cleans whitespace).
@@ -105,6 +107,8 @@ export default class AttackTreeController {
       }
     }
 
+    var identifier = 0;
+
     //regex for node syntax
     const nodeRegex = /\w+;(OR|AND)$/g;
 
@@ -122,18 +126,21 @@ export default class AttackTreeController {
     }
     var second_split = this.getLineText(lines[0]).split(";");
 
+    output += "[{";
+      output += "\"ID\": " + identifier + ",";
+      identifier++;
+
     if (lines.length === 1) {
       //must be leaf
       let metricsVerif = this.verifyMetrics(second_split);
       if (!metricsVerif[0]) {
         console.log("Metrics Bad");
-        // return [false, "Verification Error","leaf cannot"];
         this.showError(metricsVerif[1], metricsVerif[2], 1);
         return;
         // stop execution
       }
       //check for metrics
-      output += '[{"name":"' + second_split[0] + '"';
+      output += '"name":"' + second_split[0] + '"';
       let metrics_map = this.getLeafMetrics(second_split);
       //iterate over key, value pairs in metrics mapping
       for (const [key, value] of Object.entries(metrics_map)) {
@@ -144,15 +151,13 @@ export default class AttackTreeController {
     } else {
       //must be node
       if (this.getLineText(lines[0]).match(nodeRegex) === null) {
-        //console.log(lines[i]);
         console.log("Node syntax bad");
-        // return [false, "Verification Error","leaf cannot"];
         this.showError("Verification Error", "Must be <text>;<OR|AND>", 1);
         return;
         // stop execution
       }
       output +=
-        '[{"name":"' +
+        '"name":"' +
         second_split[0] +
         '", "operator":"' +
         second_split[1] +
@@ -197,6 +202,8 @@ export default class AttackTreeController {
       }
 
       output += "{";
+      output += "\"ID\": " + identifier + ",";
+      identifier++;
       curlyBraces.push("}");
 
       // Identifying leaf nodes:
@@ -280,6 +287,10 @@ export default class AttackTreeController {
       ""
     );
     Window.map.setTreeData(output.substring(1, output.length - 1));
+    const treeAnalyzerController = new TreeAnalyzerController();
+    console.log(treeAnalyzerController.generatePaths(
+      JSON.parse(output.substring(1, output.length - 1))
+    ));
   }
 
   /**
