@@ -5,8 +5,8 @@ export default class AttackTreeController {
     // D3 library also sanitizes input (e.g., won't allow tabs, cleans whitespace).
     const lineRegex = /^(\t*[\W|\w|\s]+)$/g;
     var str = text.match(lineRegex);
-    // If we do not match on the regex or str includes tab (potentially in the name).
-    if (str == null || this.getLineText(str[0]).includes("\t")) {
+    // If we do not match on the regex or str includes tab (potentially in the name) or str is blank
+    if (str == null || this.getLineText(str[0]).includes("\t") || !text.trim()) {
       // Return a format error.
       console.log('must have "tab text"');
       return [false, "Format Error", "Line must have tabs followed by text"];
@@ -288,7 +288,7 @@ export default class AttackTreeController {
     );
     Window.map.setTreeData(output.substring(1, output.length - 1));
     const treeAnalyzerController = new TreeAnalyzerController();
-    console.log(treeAnalyzerController.generatePaths(
+    console.log(treeAnalyzerController.analyzeTree(
       JSON.parse(output.substring(1, output.length - 1))
     ));
   }

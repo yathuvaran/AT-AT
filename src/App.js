@@ -1,5 +1,5 @@
 import React from "react";
-import { Tabs, Layout, Button, notification} from "antd";
+import { Tabs, Layout, Button, notification, Table, Drawer } from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
 import D3Tree from "./D3Tree";
@@ -9,9 +9,46 @@ import "codemirror/lib/codemirror.css";
 // Used for internal themes.
 // import "codemirror/theme/material-darker.css";
 const { TabPane } = Tabs;
-const {Sider, Content } = Layout;
-
+const { Sider, Content } = Layout;
 const uiController = new UIController();
+const columns = [
+  {
+    title: "Scenario",
+    dataIndex: "name",
+    render: (text) => <a>{text}</a>,
+  },
+  {
+    title: "Severity",
+    dataIndex: "age",
+  },
+];
+const data = [
+  {
+    key: "1",
+    name: "Scenario 1",
+    age: 32,
+  },
+  {
+    key: "2",
+    name: "Scenario 2",
+    age: 42,
+  },
+  {
+    key: "3",
+    name: "Scenario 3",
+    age: 32,
+  },
+  {
+    key: "4",
+    name: "Scenario 4",
+    age: 99,
+  },
+  {
+    key: "5",
+    name: "Scenario 5",
+    age: 99,
+  },
+]; // rowSelection object indicates the need for row selection
 
 // Initialize the current panes.
 var currentPanes = [
@@ -24,6 +61,21 @@ var currentPanes = [
   },
 ];
 
+const rowSelection = {
+  onChange: (selectedRowKeys, selectedRows) => {
+    console.log(
+      `selectedRowKeys: ${selectedRowKeys}`,
+      "selectedRows: ",
+      selectedRows
+    );
+  },
+  getCheckboxProps: (record) => ({
+    disabled: record.name === "Disabled User",
+    // Column configuration not to be checked
+    name: record.name,
+  }),
+};
+
 class App extends React.Component {
   newTabIndex = 1;
   // Initialize the currentIndex to be the first pane key.
@@ -32,6 +84,7 @@ class App extends React.Component {
     super(props);
     this.instance = null;
     this.state = {
+      visible: false,
       activeKey: currentPanes[0].key,
       panes: currentPanes,
       treeData: { name: "" },
@@ -59,9 +112,31 @@ class App extends React.Component {
    */
   componentDidMount() {
     // Set the size to width 350 and height 650.
-    this.instance.setSize(350, 650);
+    window.addEventListener("resize", this.handleResize);
+    // Calculate the height to be the inner window height minus the generate
+    // height and subtract the tab height to maximize the codemirror height.
+    this.instance.setSize(
+      350,
+      window.innerHeight -
+        document.getElementById("generateButtonDiv").scrollHeight -
+        document.getElementsByClassName("ant-tabs")[0].clientHeight
+    );
     Window.map = this;
   }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this.handleResize);
+  }
+
+  handleResize = (e) => {
+    console.log(document.getElementsByClassName("ant-tabs")[0].clientHeight);
+    this.instance.setSize(
+      350,
+      window.innerHeight -
+        document.getElementById("generateButtonDiv").scrollHeight -
+        document.getElementsByClassName("ant-tabs")[0].clientHeight
+    );
+  };
 
   /**
    * On a change given an activeKey.
@@ -98,7 +173,7 @@ class App extends React.Component {
       treeData: currentPanes[activeKeyIndex].content.tree,
     });
     // Set the text content to be DSL of currentPanes at the activeKeyIndex.
-    this.instance.setValue(currentPanes[activeKeyIndex].content.dsl)
+    this.instance.setValue(currentPanes[activeKeyIndex].content.dsl);
   };
 
   /**
@@ -183,7 +258,7 @@ class App extends React.Component {
       // Set the activeKey to be the newActive
       activeKey: newActiveKey,
     });
-    // If only one pain remaining, set closable to false.
+    // If only one pane remaining, set closable to false.
     if (currentPanes.length === 1) {
       newPanes[0].closable = false;
     }
@@ -197,10 +272,17 @@ class App extends React.Component {
     return this.instance.getValue();
   }
 
+  showDrawer = () => {
+    this.setState({visible: true})
+  };
+
+  onClose = () => {
+    this.setState({visible: false})
+  };
+
   render() {
     const { panes, activeKey } = this.state;
     if (this.instance != null) {
-      
     }
     return (
       <div>
@@ -229,16 +311,41 @@ class App extends React.Component {
                 lineNumbers: true,
                 indentWithTabs: true,
                 viewportMargin: 20,
-                indentUnit: 4
+                indentUnit: 4,
               }}
             />
-            <div style={{display: 'flex',  justifyContent:'center', alignItems:'center'}}>
-            <Button onClick={uiController.getInputtedDSL}>Generate</Button>
+            <div
+              id="generateButtonDiv"
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Button onClick={uiController.getInputtedDSL}>Generate</Button>
+              <Button onClick={this.showDrawer}>Analyze</Button>
             </div>
           </Sider>
           <Content id="tree">
             <D3Tree data={this.state.treeData} />
           </Content>
+          <Drawer
+            title="Attack Scenarios"
+            placement="right"
+            onClose={this.onClose}
+            visible={this.state.visible}
+          >
+            <Table
+              style={{ height: "400px" }}
+              pagination={false}
+              rowSelection={{
+                type: "radio",
+                ...rowSelection,
+              }}
+              columns={columns}
+              dataSource={data}
+            />
+          </Drawer>
         </Layout>
       </div>
     );
