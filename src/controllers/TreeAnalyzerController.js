@@ -12,17 +12,25 @@ export default class TreeAnalyzerController {
     // Iterate across paths and add to the front of pathSeverity.
     // Creating an object with an empty id array and a 0 severity.
     for (var i = 0; i < paths.length; i++) {
-      pathSeverity.unshift({ id: [], severity: 0 });
+      pathSeverity.unshift({ path: [], severity: 0 });
+      // Iterate across the nodes in each path and push that node to the path.
       for (var j = 0; j < paths[i].length; j++) {
-          pathSeverity[0]["id"].push(paths[i][j]["id"]);
+          pathSeverity[0]["path"].push(paths[i][j]["id"]);
+          // Add to the severity each of the valued weights.
           pathSeverity[0]["severity"] += paths[i][j]["value"];
       }
     }
-    return pathSeverity.sort((a,b) => b.severity - a.severity)
+    // Sort array in decreasing order by severity.
+    pathSeverity.sort((a,b) => b.severity - a.severity)
+    for (var i = 0; i < pathSeverity.length; i++) {
+      pathSeverity[i]["name"] = "Scenario " + (i + 1)
+      pathSeverity[i]["key"] = (i + 1)
+    }
+    return pathSeverity
   }
 
   /**
-   * Calculates the paths for a tree.
+   * Calculates the paths for a tree and weights for each node.
    * @param {object} tree A tree.
    * @return {Array} The list of paths.
    */
@@ -32,7 +40,6 @@ export default class TreeAnalyzerController {
     if (!("children" in tree)) {
       // Add an array to paths with the current node.
       paths.push([{ id: tree["ID"], value: this.calculateAverage(tree) }]);
-      console.log(paths);
       return paths;
     }
     //is a parent node
@@ -42,7 +49,6 @@ export default class TreeAnalyzerController {
       // Iterate across children and generate paths.
       for (var i = 0; i < children.length; i++) {
         var result = this.generatePaths(children[i]);
-        console.log(result);
         if (tree["operator"] === "OR") {
           // For each path in the result, add the current node id to the front of the path.
           for (var j = 0; j < result.length; j++) {
@@ -62,16 +68,11 @@ export default class TreeAnalyzerController {
               }
             }
             // assign deep copy to path
-            console.log("before ", newPaths);
             paths = JSON.parse(JSON.stringify(newPaths));
-            console.log("after ", paths);
           } else {
             //asign deep copy to path
-            console.log("before else", result);
             paths = JSON.parse(JSON.stringify(result));
-            console.log("after else", paths);
           }
-          console.log(paths);
           // Add resulting path to list of paths to return.
           //paths = paths.flat();
         }
@@ -80,7 +81,6 @@ export default class TreeAnalyzerController {
       for (var j = 0; j < paths.length; j++) {
         paths[j].unshift({ id: tree["ID"], value: 0 });
       }
-      console.log(paths);
       return paths;
     }
   }

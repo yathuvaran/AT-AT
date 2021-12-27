@@ -11,6 +11,7 @@ import "codemirror/lib/codemirror.css";
 const { TabPane } = Tabs;
 const { Sider, Content } = Layout;
 const uiController = new UIController();
+// Constant columns for displaying scenarios.
 const columns = [
   {
     title: "Scenario",
@@ -19,36 +20,9 @@ const columns = [
   },
   {
     title: "Severity",
-    dataIndex: "age",
+    dataIndex: "severity",
   },
 ];
-const data = [
-  {
-    key: "1",
-    name: "Scenario 1",
-    age: 32,
-  },
-  {
-    key: "2",
-    name: "Scenario 2",
-    age: 42,
-  },
-  {
-    key: "3",
-    name: "Scenario 3",
-    age: 32,
-  },
-  {
-    key: "4",
-    name: "Scenario 4",
-    age: 99,
-  },
-  {
-    key: "5",
-    name: "Scenario 5",
-    age: 99,
-  },
-]; // rowSelection object indicates the need for row selection
 
 // Initialize the current panes.
 var currentPanes = [
@@ -61,34 +35,35 @@ var currentPanes = [
   },
 ];
 
-const rowSelection = {
-  onChange: (selectedRowKeys, selectedRows) => {
-    console.log(
-      `selectedRowKeys: ${selectedRowKeys}`,
-      "selectedRows: ",
-      selectedRows
-    );
-  },
-  getCheckboxProps: (record) => ({
-    disabled: record.name === "Disabled User",
-    // Column configuration not to be checked
-    name: record.name,
-  }),
-};
 
 class App extends React.Component {
   newTabIndex = 1;
   // Initialize the currentIndex to be the first pane key.
   currentIndex = currentPanes[0].key;
   constructor(props) {
-    super(props);
+    super(props)
     this.instance = null;
     this.state = {
       visible: false,
       activeKey: currentPanes[0].key,
       panes: currentPanes,
       treeData: { name: "" },
+      scenarioData: [],
+      selectedRowsArray: [],
     };
+    this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this)
+  }
+
+  rowSelectionOnChange(selectedRowKeys, selectedRows) {
+      console.log(
+        `selectedRowKeys: ${selectedRowKeys}`,
+        "selectedRows: ",
+        selectedRows
+      );
+      this.setState({selectedRowsArray: selectedRowKeys})
+      // call uiController function after changed
+      uiController.highlightTree(this.state.treeData, selectedRows[0].path)
+      console.log(this.state.treeData)
   }
 
   /**
@@ -152,6 +127,7 @@ class App extends React.Component {
         // Save the tree data and dsl at the current index.
         currentPanes[i]["content"]["tree"] = this.state.treeData;
         currentPanes[i]["content"]["dsl"] = this.instance.getValue();
+        currentPanes[i]["content"]["scenarioData"] = this.state.scenarioData;
       }
     }
     // Active key is our target key.
@@ -171,6 +147,8 @@ class App extends React.Component {
       activeKey,
       // TreeData should be updated to the current panes at the activeKeyIndex.
       treeData: currentPanes[activeKeyIndex].content.tree,
+      scenarioData: currentPanes[activeKeyIndex].content.scenarioData,
+      selectedRowsArray: [],
     });
     // Set the text content to be DSL of currentPanes at the activeKeyIndex.
     this.instance.setValue(currentPanes[activeKeyIndex].content.dsl);
@@ -264,8 +242,12 @@ class App extends React.Component {
     }
   };
 
-  setTreeData(sentData) {
-    this.setState({ treeData: JSON.parse(sentData) });
+  setTreeData(inputTreeData) {
+    this.setState({ treeData: JSON.parse(inputTreeData) });
+  }
+
+  setScenarioData(attackScenarios){
+    this.setState({scenarioData: attackScenarios})
   }
 
   getTextAreaValue() {
@@ -279,6 +261,11 @@ class App extends React.Component {
   onClose = () => {
     this.setState({visible: false})
   };
+
+  generate = () => {
+    this.setState({selectedRowsArray: [],})
+    uiController.getInputtedDSL();
+  }
 
   render() {
     const { panes, activeKey } = this.state;
@@ -322,8 +309,8 @@ class App extends React.Component {
                 alignItems: "center",
               }}
             >
-              <Button onClick={uiController.getInputtedDSL}>Generate</Button>
-              <Button onClick={this.showDrawer}>Analyze</Button>
+              <Button onClick={this.generate}>Generate</Button>
+              <Button onClick={this.showDrawer}>Show Scenarios</Button>
             </div>
           </Sider>
           <Content id="tree">
@@ -340,10 +327,11 @@ class App extends React.Component {
               pagination={false}
               rowSelection={{
                 type: "radio",
-                ...rowSelection,
+                onChange: this.rowSelectionOnChange,
+                selectedRowKeys: this.state.selectedRowsArray,
               }}
               columns={columns}
-              dataSource={data}
+              dataSource={this.state.scenarioData}
             />
           </Drawer>
         </Layout>
