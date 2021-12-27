@@ -280,7 +280,6 @@ export default class AttackTreeController {
     }
 
     // Set tree data removing square brackets from start and end
-    console.log(output);
     Window.map.openNotificationWithIcon(
       "success",
       "Tree Generation Successful",

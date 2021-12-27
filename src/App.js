@@ -12,6 +12,42 @@ const { TabPane } = Tabs;
 const { Sider, Content } = Layout;
 const uiController = new UIController();
 // Constant columns for displaying scenarios.
+const bigboy = {
+  name: 'CEO',
+  children: [
+    {
+      name: 'Manager',
+      attributes: {
+        department: 'Production',
+      },
+      children: [
+        {
+          name: 'Foreman',
+          attributes: {
+            fill: "red",
+            department: 'Fabrication',
+          },
+          children: [
+            {
+              name: 'Worker',
+            },
+          ],
+        },
+        {
+          name: 'Foreman',
+          attributes: {
+            department: 'Assembly',
+          },
+          children: [
+            {
+              name: 'Worker',
+            },
+          ],
+        },
+      ],
+    },
+  ],
+};
 const columns = [
   {
     title: "Scenario",
@@ -62,7 +98,8 @@ class App extends React.Component {
       );
       this.setState({selectedRowsArray: selectedRowKeys})
       // call uiController function after changed
-      uiController.highlightTree(this.state.treeData, selectedRows[0].path)
+      console.log(this.state.treeData);
+      this.setState({treeData: uiController.highlightTree(this.state.treeData, selectedRows[0].path)})
       console.log(this.state.treeData)
   }
 
@@ -314,7 +351,7 @@ class App extends React.Component {
             </div>
           </Sider>
           <Content id="tree">
-            <D3Tree data={this.state.treeData} />
+            <D3Tree data={bigboy} />
           </Content>
           <Drawer
             title="Attack Scenarios"
