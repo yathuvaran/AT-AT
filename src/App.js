@@ -47,7 +47,7 @@ class App extends React.Component {
       activeKey: currentPanes[0].key,
       panes: currentPanes,
       treeData: { name: "" },
-      treeDataHighlight: {},
+      treeDataSaved: {},
       scenarioData: [],
       selectedRowsArray: [],
     };
@@ -56,10 +56,18 @@ class App extends React.Component {
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
     // call uiController function after changed
+    // this.setState({ selectedRowsArray: selectedRowKeys,
+    //   treeData: uiController.highlightTree(
+    //     JSON.parse(JSON.stringify(this.state.treeDataSaved)),
+    //     selectedRows[0].path
+    //   ), }, () => {
+    //   console.log('after rowselection treeData', this.state.treeData);
+    //   console.log('after rowselection treeDataSaved', this.state.treeDataSaved);
+    // }); 
     this.setState({
       selectedRowsArray: selectedRowKeys,
       treeData: uiController.highlightTree(
-        this.state.treeData,
+        JSON.parse(JSON.stringify(this.state.treeDataSaved)),
         selectedRows[0].path
       ),
     });
@@ -119,14 +127,10 @@ class App extends React.Component {
   onChange = (activeKey) => {
     // Save everything associated with current index to currentPanes.
     for (var i = 0; i < currentPanes.length; i++) {
-      console.log("indexKey: ", currentPanes[i].key);
-      console.log("currentIndex: ", this.currentIndex);
       // If indexed currentPanes key matches the current index.
       if (currentPanes[i].key === this.currentIndex) {
         // Save the tree data and dsl at the current index.
-        console.log(typeof this.state.treeData);
-        currentPanes[i]["content"]["tree"] = this.state.treeData;
-        console.log(typeof currentPanes[i]["content"]["tree"]);
+        currentPanes[i]["content"]["tree"] = this.state.treeDataSaved;
         currentPanes[i]["content"]["dsl"] = this.instance.getValue();
         currentPanes[i]["content"]["scenarioData"] = this.state.scenarioData;
       }
@@ -148,6 +152,7 @@ class App extends React.Component {
       activeKey,
       // TreeData should be updated to the current panes at the activeKeyIndex.
       treeData: currentPanes[activeKeyIndex].content.tree,
+      treeDataSaved: currentPanes[activeKeyIndex].content.tree,
       scenarioData: currentPanes[activeKeyIndex].content.scenarioData,
       selectedRowsArray: [],
     });
@@ -244,7 +249,10 @@ class App extends React.Component {
   };
 
   setTreeData(inputTreeData) {
-    this.setState({ treeData: JSON.parse(inputTreeData) });
+    this.setState({
+      treeData: JSON.parse(inputTreeData),
+      treeDataSaved: JSON.parse(inputTreeData),
+    });
   }
 
   setScenarioData(attackScenarios) {
@@ -256,7 +264,7 @@ class App extends React.Component {
   }
 
   showDrawer = () => {
-    this.setState({visible: true})
+    this.setState({ visible: true });
   };
 
   onClose = () => {

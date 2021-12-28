@@ -8,7 +8,6 @@ export default class AttackTreeController {
     // If we do not match on the regex or str includes tab (potentially in the name) or str is blank
     if (str == null || this.getLineText(str[0]).includes("\t") || !text.trim()) {
       // Return a format error.
-      console.log('must have "tab text"');
       return [false, "Format Error", "Line must have tabs followed by text"];
     }
     return [true];
@@ -23,7 +22,6 @@ export default class AttackTreeController {
     var numOfTabs = 0;
     var start = 0;
     while (line.charAt(start++) === "\t") numOfTabs++;
-    console.log(numOfTabs);
     // Return numOfTabs + 1 because we start at depth of 1.
     return numOfTabs + 1;
   }
@@ -285,12 +283,11 @@ export default class AttackTreeController {
       "Tree Generation Successful",
       ""
     );
-    Window.map.setTreeData(output.substring(1, output.length - 1));
+    output = output.substring(1, output.length - 1)
+    Window.map.setTreeData(output);
     const treeAnalyzerController = new TreeAnalyzerController();
-    console.log(treeAnalyzerController.analyzeTree(
-      JSON.parse(output.substring(1, output.length - 1))))
     Window.map.setScenarioData(treeAnalyzerController.analyzeTree(
-      JSON.parse(output.substring(1, output.length - 1))
+      JSON.parse(output)
     ));
   }
 

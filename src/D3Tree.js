@@ -11,12 +11,20 @@ class D3Tree extends React.Component {
       </g>
     ) : (
       <g>
-        <rect width="20" height="20" x="-10" onClick={toggleNode} fill="blue" />
+        <rect width="20" height="20" x="-10" onClick={toggleNode} />
         <text fill="black" strokeWidth="1" x="20">
           {nodeDatum.name}
         </text>
       </g>
     );
+
+  getDynamicPathClass = ({ source, target }, orientation) => {
+    console.log('target', target)
+    if (target["data"]["highlight"]) {
+      // Target node has no children -> this link leads to a leaf node.
+      return "highlight_link";
+    }
+  };
   render() {
     return (
       <Tree
@@ -24,6 +32,7 @@ class D3Tree extends React.Component {
         data={this.props.data}
         translate={{ x: 600, y: 200 }}
         renderCustomNodeElement={this.renderSvgNode}
+        pathClassFunc={this.getDynamicPathClass}
       ></Tree>
     );
   }
