@@ -13,17 +13,3 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
-
-.node__root > circle {
-  fill: red;
-}
-
-.node__branch > circle {
-  fill: yellow;
-}
-
-.node__leaf > circle {
-  fill: green;
-  /* Let's also make the radius of leaf nodes larger */
-  r: 40;
-}

@@ -12,42 +12,6 @@ const { TabPane } = Tabs;
 const { Sider, Content } = Layout;
 const uiController = new UIController();
 // Constant columns for displaying scenarios.
-const bigboy = {
-  name: 'CEO',
-  children: [
-    {
-      name: 'Manager',
-      attributes: {
-        department: 'Production',
-      },
-      children: [
-        {
-          name: 'Foreman',
-          attributes: {
-            fill: "red",
-            department: 'Fabrication',
-          },
-          children: [
-            {
-              name: 'Worker',
-            },
-          ],
-        },
-        {
-          name: 'Foreman',
-          attributes: {
-            department: 'Assembly',
-          },
-          children: [
-            {
-              name: 'Worker',
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
 const columns = [
   {
     title: "Scenario",
@@ -71,36 +35,34 @@ var currentPanes = [
   },
 ];
 
-
 class App extends React.Component {
   newTabIndex = 1;
   // Initialize the currentIndex to be the first pane key.
   currentIndex = currentPanes[0].key;
   constructor(props) {
-    super(props)
+    super(props);
     this.instance = null;
     this.state = {
       visible: false,
       activeKey: currentPanes[0].key,
       panes: currentPanes,
       treeData: { name: "" },
+      treeDataHighlight: {},
       scenarioData: [],
       selectedRowsArray: [],
     };
-    this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this)
+    this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this);
   }
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
-      console.log(
-        `selectedRowKeys: ${selectedRowKeys}`,
-        "selectedRows: ",
-        selectedRows
-      );
-      this.setState({selectedRowsArray: selectedRowKeys})
-      // call uiController function after changed
-      console.log(this.state.treeData);
-      this.setState({treeData: uiController.highlightTree(this.state.treeData, selectedRows[0].path)})
-      console.log(this.state.treeData)
+    // call uiController function after changed
+    this.setState({
+      selectedRowsArray: selectedRowKeys,
+      treeData: uiController.highlightTree(
+        this.state.treeData,
+        selectedRows[0].path
+      ),
+    });
   }
 
   /**
@@ -162,7 +124,9 @@ class App extends React.Component {
       // If indexed currentPanes key matches the current index.
       if (currentPanes[i].key === this.currentIndex) {
         // Save the tree data and dsl at the current index.
+        console.log(typeof this.state.treeData);
         currentPanes[i]["content"]["tree"] = this.state.treeData;
+        console.log(typeof currentPanes[i]["content"]["tree"]);
         currentPanes[i]["content"]["dsl"] = this.instance.getValue();
         currentPanes[i]["content"]["scenarioData"] = this.state.scenarioData;
       }
@@ -283,8 +247,8 @@ class App extends React.Component {
     this.setState({ treeData: JSON.parse(inputTreeData) });
   }
 
-  setScenarioData(attackScenarios){
-    this.setState({scenarioData: attackScenarios})
+  setScenarioData(attackScenarios) {
+    this.setState({ scenarioData: attackScenarios });
   }
 
   getTextAreaValue() {
@@ -296,13 +260,13 @@ class App extends React.Component {
   };
 
   onClose = () => {
-    this.setState({visible: false})
+    this.setState({ visible: false });
   };
 
   generate = () => {
-    this.setState({selectedRowsArray: [],})
+    this.setState({ selectedRowsArray: [] });
     uiController.getInputtedDSL();
-  }
+  };
 
   render() {
     const { panes, activeKey } = this.state;
@@ -351,7 +315,7 @@ class App extends React.Component {
             </div>
           </Sider>
           <Content id="tree">
-            <D3Tree data={bigboy} />
+            <D3Tree data={this.state.treeData} />
           </Content>
           <Drawer
             title="Attack Scenarios"
