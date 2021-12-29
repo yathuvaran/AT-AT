@@ -16,4 +16,10 @@ body {
 
 .highlight_link{
   stroke:red !important;
+  stroke-width: 3;
+  stroke-opacity: 1;
+}
+
+.default_link{
+  stroke-opacity: 1;
 }

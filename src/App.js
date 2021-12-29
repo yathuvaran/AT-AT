@@ -55,22 +55,47 @@ class App extends React.Component {
   }
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
-    // call uiController function after changed
-    // this.setState({ selectedRowsArray: selectedRowKeys,
-    //   treeData: uiController.highlightTree(
-    //     JSON.parse(JSON.stringify(this.state.treeDataSaved)),
-    //     selectedRows[0].path
-    //   ), }, () => {
-    //   console.log('after rowselection treeData', this.state.treeData);
-    //   console.log('after rowselection treeDataSaved', this.state.treeDataSaved);
-    // }); 
-    this.setState({
-      selectedRowsArray: selectedRowKeys,
+    //call uiController function after changed
+    this.setState({ selectedRowsArray: selectedRowKeys,
       treeData: uiController.highlightTree(
         JSON.parse(JSON.stringify(this.state.treeDataSaved)),
         selectedRows[0].path
-      ),
+      ), }, () => {
+        var highlight_links = document.getElementsByClassName("highlight_link");
+        const parent = highlight_links[0].parentNode;
+        for (var i = 0; i < highlight_links.length; i++) {
+          console.log("moved link", highlight_links[i])
+          parent.appendChild(highlight_links[0]);
+          console.log("loop number: ", i)
+          //highlight_links[0].parentNode.removeChild(highlight_links[0]);
+        }
+        console.log('parent node', parent)
     });
+    // this.setState({
+    //   selectedRowsArray: selectedRowKeys,
+    //   treeData: uiController.highlightTree(
+    //     JSON.parse(JSON.stringify(this.state.treeDataSaved)),
+    //     selectedRows[0].path
+    //   ),
+    // });
+    // will not work if only one node
+    // var highlight_links = document.getElementsByClassName("highlight_link");
+    // console.log(highlight_links)
+    // const parent = highlight_links[0].parentNode;
+    // while (highlight_links.length > 0) {
+    //   highlight_links[0].parentNode.removeChild(highlight_links[0]);
+    // }
+    // console.log(parent);
+    // console.log('default', default_links)
+    // for (var i = 0; i < default_links.length; i++) {
+    //   parent.appendChild(default_links[0]);
+    // }
+    // for (var i = 0; i < highlight_links.length; i++) {
+    //   parent.appendChild(highlight_links[0]);
+    // }
+    // console.log(default_links);
+    // console.log(highlight_links);
+    // console.log(parent);
   }
 
   /**
@@ -111,7 +136,6 @@ class App extends React.Component {
   }
 
   handleResize = (e) => {
-    console.log(document.getElementsByClassName("ant-tabs")[0].clientHeight);
     this.instance.setSize(
       350,
       window.innerHeight -
@@ -138,7 +162,6 @@ class App extends React.Component {
     // Active key is our target key.
     // TODO: Fix variable name.
     this.currentIndex = activeKey;
-    console.log(currentPanes);
     var activeKeyIndex = 0;
     // Iterate across currentPanes.
     for (i = 0; i < currentPanes.length; i++) {
@@ -231,11 +254,8 @@ class App extends React.Component {
     }
     this.onChange(newActiveKey);
 
-    console.log("target", targetKey);
     // Remove the target pane from the current panes.
     currentPanes = currentPanes.filter((pane) => pane.key !== targetKey);
-    console.log("newActiveKey", newActiveKey);
-    console.log(currentPanes);
     this.setState({
       // Set the panes to be the newPanes.
       panes: newPanes,
