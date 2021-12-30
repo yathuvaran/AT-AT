@@ -1,15 +1,25 @@
 import React from "react";
-import { Tabs, Layout, Button, notification, Table, Drawer } from "antd";
+import {
+  Tabs,
+  Layout,
+  Button,
+  notification,
+  Table,
+  Drawer,
+  Typography,
+} from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
 import D3Tree from "./D3Tree";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
+
 // Keep this import here just in case.
 // Used for internal themes.
 // import "codemirror/theme/material-darker.css";
 const { TabPane } = Tabs;
-const { Sider, Content } = Layout;
+const { Sider, Content, Footer } = Layout;
+const { Title } = Typography;
 const uiController = new UIController();
 // Constant columns for displaying scenarios.
 const columns = [
@@ -56,21 +66,28 @@ class App extends React.Component {
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
     //call uiController function after changed
-    this.setState({ selectedRowsArray: selectedRowKeys,
-      treeData: uiController.highlightTree(
-        JSON.parse(JSON.stringify(this.state.treeDataSaved)),
-        selectedRows[0].path
-      ), }, () => {
+    this.setState(
+      {
+        selectedRowsArray: selectedRowKeys,
+        treeData: uiController.highlightTree(
+          JSON.parse(JSON.stringify(this.state.treeDataSaved)),
+          selectedRows[0].path
+        ),
+      },
+      () => {
         var highlight_links = document.getElementsByClassName("highlight_link");
-        const parent = highlight_links[0].parentNode;
-        for (var i = 0; i < highlight_links.length; i++) {
-          console.log("moved link", highlight_links[i])
-          parent.appendChild(highlight_links[0]);
-          console.log("loop number: ", i)
-          //highlight_links[0].parentNode.removeChild(highlight_links[0]);
+        var svg_nodes = document.getElementsByClassName("rd3t-node");
+        if (svg_nodes[0]) {
+          const parent = svg_nodes[0].parentNode;
+          for (var i = 0; i < highlight_links.length; i++) {
+            parent.appendChild(highlight_links[0]);
+          }
+          for (var i = 0; i < svg_nodes.length; i++) {
+            parent.appendChild(svg_nodes[0]);
+          }
         }
-        console.log('parent node', parent)
-    });
+      }
+    );
     // this.setState({
     //   selectedRowsArray: selectedRowKeys,
     //   treeData: uiController.highlightTree(
@@ -122,6 +139,8 @@ class App extends React.Component {
     window.addEventListener("resize", this.handleResize);
     // Calculate the height to be the inner window height minus the generate
     // height and subtract the tab height to maximize the codemirror height.
+    console.log(document.getElementById("tree").offsetWidth.toString() + 'px')
+    document.getElementById("recy").style.width = window.innerWidth - document.getElementById("code_sider").offsetWidth.toString() + 'px';
     this.instance.setSize(
       350,
       window.innerHeight -
@@ -136,6 +155,7 @@ class App extends React.Component {
   }
 
   handleResize = (e) => {
+    document.getElementById("recy").style.width = window.innerWidth - document.getElementById("code_sider").offsetWidth.toString() + 'px';
     this.instance.setSize(
       350,
       window.innerHeight -
@@ -269,10 +289,21 @@ class App extends React.Component {
   };
 
   setTreeData(inputTreeData) {
-    this.setState({
-      treeData: JSON.parse(inputTreeData),
-      treeDataSaved: JSON.parse(inputTreeData),
-    });
+    this.setState(
+      {
+        treeData: JSON.parse(inputTreeData),
+        treeDataSaved: JSON.parse(inputTreeData),
+      },
+      () => {
+        var svg_nodes = document.getElementsByClassName("rd3t-node");
+        if (svg_nodes[0]) {
+          const parent = svg_nodes[0].parentNode;
+          for (var i = 0; i < svg_nodes.length; i++) {
+            parent.appendChild(svg_nodes[0]);
+          }
+        }
+      }
+    );
   }
 
   setScenarioData(attackScenarios) {
@@ -317,7 +348,7 @@ class App extends React.Component {
           ))}
         </Tabs>
         <Layout>
-          <Sider width={350}>
+          <Sider width={350} id="code_sider">
             <CodeMirror
               editorDidMount={(editor) => {
                 this.instance = editor;
@@ -342,27 +373,34 @@ class App extends React.Component {
               <Button onClick={this.showDrawer}>Show Scenarios</Button>
             </div>
           </Sider>
-          <Content id="tree">
-            <D3Tree data={this.state.treeData} />
-          </Content>
-          <Drawer
-            title="Attack Scenarios"
-            placement="right"
-            onClose={this.onClose}
-            visible={this.state.visible}
-          >
-            <Table
-              style={{ height: "400px" }}
-              pagination={false}
-              rowSelection={{
-                type: "radio",
-                onChange: this.rowSelectionOnChange,
-                selectedRowKeys: this.state.selectedRowsArray,
-              }}
-              columns={columns}
-              dataSource={this.state.scenarioData}
-            />
-          </Drawer>
+          <Layout>
+            <Content id="tree">
+              <D3Tree data={this.state.treeData} />
+            </Content>
+            <Drawer
+              title="Attack Scenarios"
+              placement="right"
+              onClose={this.onClose}
+              visible={this.state.visible}
+            >
+              <Table
+                style={{ height: "400px" }}
+                pagination={false}
+                rowSelection={{
+                  type: "radio",
+                  onChange: this.rowSelectionOnChange,
+                  selectedRowKeys: this.state.selectedRowsArray,
+                }}
+                columns={columns}
+                dataSource={this.state.scenarioData}
+              />
+            </Drawer>
+            <div id="recy">
+              <Title level={4}>Reccomentations For: Scenario 1</Title>
+              <Title level={3}>test</Title>
+              <div>lorem</div>
+            </div>
+          </Layout>
         </Layout>
       </div>
     );

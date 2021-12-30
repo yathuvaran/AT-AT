@@ -2,6 +2,8 @@ import React from "react";
 import Tree from "react-d3-tree";
 import AND from "./assets/AND.png";
 import AND_RED from "./assets/AND_RED.png";
+import OR from "./assets/OR.png";
+import OR_RED from "./assets/OR_RED.png";
 
 const nodeSize = { x: 100, y: 150 };
 
@@ -37,22 +39,76 @@ class D3Tree extends React.Component {
 
   renderHighlightedOrNode(nodeDatum, toggleNode, foreignObjectProps) {
     return (
-      <g>
-        <rect width="20" height="20" x="-10" onClick={toggleNode} />
-        <text fill="black" strokeWidth="1" x="20">
-          {nodeDatum.name}
-        </text>
+      <g onClick={toggleNode}>
+        <foreignObject {...foreignObjectProps}>
+          <div
+            style={{
+              backgroundColor: "#f0f2f5",
+            }}
+          >
+            <img
+              src={OR_RED}
+              alt="or_red"
+              style={{
+                height: 50,
+                position: "absolute",
+                zIndex: 10,
+                top: 5,
+                left: 27,
+                backgroundColor: "#f0f2f5",
+              }}
+            />
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: 55,
+                fontWeight: "bold",
+                zIndex: 12,
+                backgroundColor: "#f0f2f5"
+              }}
+            >
+              {nodeDatum.name}
+            </div>
+          </div>
+        </foreignObject>
       </g>
     );
   }
 
   renderOrNode(nodeDatum, toggleNode, foreignObjectProps) {
     return (
-      <g>
-        <rect width="20" height="20" x="-10" onClick={toggleNode} />
-        <text fill="black" strokeWidth="1" x="20">
-          {nodeDatum.name}
-        </text>
+      <g onClick={toggleNode}>
+        <foreignObject {...foreignObjectProps}>
+          <div
+            style={{
+              backgroundColor: "#f0f2f5",
+            }}
+          >
+            <img
+              src={OR}
+              alt="or"
+              style={{
+                height: 50,
+                position: "absolute",
+                zIndex: 10,
+                top: 5,
+                left: 27,
+                backgroundColor: "#f0f2f5",
+              }}
+            />
+            <div
+              style={{
+                textAlign: "center",
+                marginTop: 55,
+                fontWeight: "bold",
+                zIndex: 12,
+                backgroundColor: "#f0f2f5"
+              }}
+            >
+              {nodeDatum.name}
+            </div>
+          </div>
+        </foreignObject>
       </g>
     );
   }
@@ -75,6 +131,7 @@ class D3Tree extends React.Component {
                 zIndex: 10,
                 top: 5,
                 left: 25,
+                backgroundColor: "#f0f2f5",
               }}
             />
             <div
@@ -83,6 +140,7 @@ class D3Tree extends React.Component {
                 marginTop: 55,
                 fontWeight: "bold",
                 zIndex: 11,
+                backgroundColor: "#f0f2f5",
               }}
             >
               {nodeDatum.name}
@@ -111,6 +169,7 @@ class D3Tree extends React.Component {
                 zIndex: 10,
                 top: 5,
                 left: 25,
+                backgroundColor: "#f0f2f5",
               }}
             />
             <div
@@ -118,7 +177,8 @@ class D3Tree extends React.Component {
                 textAlign: "center",
                 marginTop: 55,
                 fontWeight: "bold",
-                zIndex: 11,
+                zIndex: 12,
+                backgroundColor: "#f0f2f5"
               }}
             >
               {nodeDatum.name}

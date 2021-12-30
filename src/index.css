@@ -23,3 +23,15 @@ body {
 .default_link{
   stroke-opacity: 1;
 }
+
+#recy{
+  z-index: 5 !important;
+  background-color: rgba(0, 0, 0, 0.1) !important;
+  position: absolute;
+  bottom:0;
+  padding: 2em;
+}
+
+#tree{
+  z-index: 3 !important;
+}
