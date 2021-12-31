@@ -139,8 +139,11 @@ class App extends React.Component {
     window.addEventListener("resize", this.handleResize);
     // Calculate the height to be the inner window height minus the generate
     // height and subtract the tab height to maximize the codemirror height.
-    console.log(document.getElementById("tree").offsetWidth.toString() + 'px')
-    document.getElementById("recy").style.width = window.innerWidth - document.getElementById("code_sider").offsetWidth.toString() + 'px';
+    console.log(document.getElementById("tree").offsetWidth.toString() + "px");
+    document.getElementById("recy").style.width =
+      window.innerWidth -
+      document.getElementById("code_sider").offsetWidth.toString() +
+      "px";
     this.instance.setSize(
       350,
       window.innerHeight -
@@ -155,7 +158,10 @@ class App extends React.Component {
   }
 
   handleResize = (e) => {
-    document.getElementById("recy").style.width = window.innerWidth - document.getElementById("code_sider").offsetWidth.toString() + 'px';
+    document.getElementById("recy").style.width =
+      window.innerWidth -
+      document.getElementById("code_sider").offsetWidth.toString() +
+      "px";
     this.instance.setSize(
       350,
       window.innerHeight -
@@ -327,6 +333,13 @@ class App extends React.Component {
     uiController.getInputtedDSL();
   };
 
+  clearSelection = () => {
+    this.setState({
+      treeData: JSON.parse(JSON.stringify(this.state.treeDataSaved)),
+      selectedRowsArray: [],
+    });
+  };
+
   render() {
     const { panes, activeKey } = this.state;
     if (this.instance != null) {
@@ -383,6 +396,7 @@ class App extends React.Component {
               onClose={this.onClose}
               visible={this.state.visible}
             >
+              <Button onClick={this.clearSelection}>Clear</Button>
               <Table
                 style={{ height: "400px" }}
                 pagination={false}
