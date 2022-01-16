@@ -11,6 +11,7 @@ import {
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
 import D3Tree from "./components/D3Tree";
+import MenuBar from "./components/MenuBar";
 import RecommendationBox from "./components/RecommendationBox";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
@@ -64,6 +65,7 @@ class App extends React.Component {
       scenarioData: [],
       selectedRowsArray: [],
       highestMetricsData: {},
+      showRecommendations: false,
     };
     this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this);
   }
@@ -77,7 +79,8 @@ class App extends React.Component {
           JSON.parse(JSON.stringify(this.state.treeDataSaved)),
           selectedRows[0].path
         ),
-        highestMetricsData: selectedRows[0]
+        highestMetricsData: selectedRows[0],
+        showRecommendations: this.state.showRecommendations,
       },
       () => {
         var highlight_links = document.getElementsByClassName("highlight_link");
@@ -145,16 +148,22 @@ class App extends React.Component {
     // Calculate the height to be the inner window height minus the generate
     // height and subtract the tab height to maximize the codemirror height.
     console.log(document.getElementById("tree").offsetWidth.toString() + "px");
-    document.getElementById("recommendation_box").style.width =
-      window.innerWidth -
-      document.getElementById("code_sider").offsetWidth.toString() +
-      "px";
+    console.log(document.getElementsByClassName("ant-menu")[0])
     this.instance.setSize(
       350,
       window.innerHeight -
         document.getElementById("generateButtonDiv").scrollHeight -
-        document.getElementsByClassName("ant-tabs")[0].clientHeight
-    );
+        document.getElementsByClassName("ant-tabs")[0].clientHeight -
+        document.getElementsByClassName("ant-menu")[0].scrollHeight
+      );
+    
+    // Check if recommendation box present before getting the style.
+    if (document.getElementById("recommendation_box")) {
+      document.getElementById("recommendation_box").style.width =
+        window.innerWidth -
+        document.getElementById("code_sider").offsetWidth.toString() +
+        "px";
+    }
     Window.map = this;
   }
 
@@ -162,16 +171,20 @@ class App extends React.Component {
     window.removeEventListener("resize", this.handleResize);
   }
 
+  // Code in handleResize should be in componentDidMount.
   handleResize = (e) => {
-    document.getElementById("recommendation_box").style.width =
-      window.innerWidth -
-      document.getElementById("code_sider").offsetWidth.toString() +
-      "px";
+    if (document.getElementById("recommendation_box")) {
+      document.getElementById("recommendation_box").style.width =
+        window.innerWidth -
+        document.getElementById("code_sider").offsetWidth.toString() +
+        "px";
+    }
     this.instance.setSize(
       350,
       window.innerHeight -
         document.getElementById("generateButtonDiv").scrollHeight -
-        document.getElementsByClassName("ant-tabs")[0].clientHeight
+        document.getElementsByClassName("ant-tabs")[0].clientHeight - 
+        document.getElementsByClassName("ant-menu")[0].scrollHeight
     );
   };
 
@@ -209,6 +222,7 @@ class App extends React.Component {
       treeDataSaved: currentPanes[activeKeyIndex].content.tree,
       scenarioData: currentPanes[activeKeyIndex].content.scenarioData,
       selectedRowsArray: [],
+      highestMetricsData: {},
     });
     // Set the text content to be DSL of currentPanes at the activeKeyIndex.
     this.instance.setValue(currentPanes[activeKeyIndex].content.dsl);
@@ -317,6 +331,11 @@ class App extends React.Component {
     );
   }
 
+  showRecommendations() {
+    this.setState({ showRecommendations: !this.state.showRecommendations });
+    console.log(this.state.showRecommendations);
+  }
+
   setScenarioData(attackScenarios) {
     this.setState({ scenarioData: attackScenarios });
   }
@@ -351,6 +370,9 @@ class App extends React.Component {
     }
     return (
       <div>
+        <MenuBar
+          enableRecommendation={this.state.showRecommendations}
+        ></MenuBar>
         <Tabs
           type="editable-card"
           onChange={this.onChange}
@@ -414,7 +436,13 @@ class App extends React.Component {
                 dataSource={this.state.scenarioData}
               />
             </Drawer>
-            <RecommendationBox data={this.state.highestMetricsData}></RecommendationBox>
+            {!this.state.showRecommendations ? (
+              <div></div>
+            ) : (
+              <RecommendationBox
+                data={this.state.highestMetricsData}
+              ></RecommendationBox>
+            )}
           </Layout>
         </Layout>
       </div>
