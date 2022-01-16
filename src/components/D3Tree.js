@@ -1,9 +1,9 @@
 import React from "react";
 import Tree from "react-d3-tree";
-import AND from "./assets/AND.png";
-import AND_RED from "./assets/AND_RED.png";
-import OR from "./assets/OR.png";
-import OR_RED from "./assets/OR_RED.png";
+import AND from "../assets/AND.png";
+import AND_RED from "../assets/AND_RED.png";
+import OR from "../assets/OR.png";
+import OR_RED from "../assets/OR_RED.png";
 
 const nodeSize = { x: 100, y: 150 };
 

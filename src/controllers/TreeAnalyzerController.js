@@ -7,18 +7,35 @@ export default class TreeAnalyzerController {
   analyzeTree(tree) {
     // Initialize empty path severity array.
     var pathSeverity = [];
+    // Array to hold metric characters.
+    var metrics = ["l", "v", "r", "t"];
     // Get the generated paths for a tree.
     var paths = this.generatePaths(tree);
     // Iterate across paths and add to the front of pathSeverity.
     // Creating an object with an empty id array and a 0 severity.
     for (var i = 0; i < paths.length; i++) {
-      pathSeverity.unshift({ path: [], severity: 0 });
+      // Initialize object to hold 4 highest metrics for the path
+      var highestMetrics = {};
+
+      pathSeverity.unshift({ path: [], severity: 0 , highestMetrics: {}});
       // Iterate across the nodes in each path and push that node to the path.
       for (var j = 0; j < paths[i].length; j++) {
+        
+        //check if leaf first, if so, determine if it has highest metrics in path
+          if (paths[i][j]["metrics"]) {
+            metrics.forEach(metric => {
+              if(!highestMetrics[metric] || !highestMetrics[metric][0] || highestMetrics[metric][0] < paths[i][j]["metrics"][metric]) {
+                highestMetrics[metric] = [paths[i][j]["metrics"][metric], paths[i][j]["name"]] ;
+              }
+            })           
+          }
+
           pathSeverity[0]["path"].push(paths[i][j]["id"]);
           // Add to the severity each of the valued weights.
           pathSeverity[0]["severity"] += paths[i][j]["value"];
       }
+      pathSeverity[0]["highestMetrics"] = highestMetrics;
+      
     }
     // Sort array in decreasing order by severity.
     pathSeverity.sort((a,b) => b.severity - a.severity)
@@ -26,6 +43,7 @@ export default class TreeAnalyzerController {
       pathSeverity[i]["name"] = "Scenario " + (i + 1)
       pathSeverity[i]["key"] = (i + 1)
     }
+    console.log(pathSeverity)
     return pathSeverity
   }
 
@@ -39,7 +57,8 @@ export default class TreeAnalyzerController {
     //base case; if a leaf node or root node by itself
     if (!("children" in tree)) {
       // Add an array to paths with the current node.
-      paths.push([{ id: tree["ID"], value: this.calculateAverage(tree) }]);
+      console.log(tree)
+      paths.push([{ id: tree["ID"], value: this.calculateAverage(tree), metrics: this.getMetrics(tree), name: tree["name"] }]);
       return paths;
     }
     //is a parent node
@@ -79,10 +98,17 @@ export default class TreeAnalyzerController {
       }
       // Iterate across paths and add current node id at front.
       for (var j = 0; j < paths.length; j++) {
+        console.log(paths);
         paths[j].unshift({ id: tree["ID"], value: 0 });
       }
+      console.log(paths);
       return paths;
     }
+  }
+
+
+  getMetrics(tree) {
+    return {"l": tree["l"], "v": tree["v"], "r": tree["r"], "t": tree["t"]}
   }
 
   /**

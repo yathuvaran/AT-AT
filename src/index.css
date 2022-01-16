@@ -8,12 +8,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.tree-container{
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
-}
-
 .highlight_link{
   stroke:red !important;
   stroke-width: 3;
@@ -24,7 +18,7 @@ body {
   stroke-opacity: 1;
 }
 
-#recy{
+#recommendation_box {
   z-index: 5 !important;
   background-color: rgba(0, 0, 0, 0.1) !important;
   position: absolute;

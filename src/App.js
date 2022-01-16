@@ -10,10 +10,13 @@ import {
 } from "antd";
 import "antd/dist/antd.css";
 import UIController from "./controllers/UIController";
-import D3Tree from "./D3Tree";
+import D3Tree from "./components/D3Tree";
+import RecommendationBox from "./components/RecommendationBox";
 import { UnControlled as CodeMirror } from "react-codemirror2";
 import "codemirror/lib/codemirror.css";
 
+// Attack tree metrics will include likelihood (L), victim impact (V),
+// resource points (R), and time (T).
 // Keep this import here just in case.
 // Used for internal themes.
 // import "codemirror/theme/material-darker.css";
@@ -60,6 +63,7 @@ class App extends React.Component {
       treeDataSaved: {},
       scenarioData: [],
       selectedRowsArray: [],
+      highestMetricsData: {},
     };
     this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this);
   }
@@ -73,6 +77,7 @@ class App extends React.Component {
           JSON.parse(JSON.stringify(this.state.treeDataSaved)),
           selectedRows[0].path
         ),
+        highestMetricsData: selectedRows[0]
       },
       () => {
         var highlight_links = document.getElementsByClassName("highlight_link");
@@ -140,7 +145,7 @@ class App extends React.Component {
     // Calculate the height to be the inner window height minus the generate
     // height and subtract the tab height to maximize the codemirror height.
     console.log(document.getElementById("tree").offsetWidth.toString() + "px");
-    document.getElementById("recy").style.width =
+    document.getElementById("recommendation_box").style.width =
       window.innerWidth -
       document.getElementById("code_sider").offsetWidth.toString() +
       "px";
@@ -158,7 +163,7 @@ class App extends React.Component {
   }
 
   handleResize = (e) => {
-    document.getElementById("recy").style.width =
+    document.getElementById("recommendation_box").style.width =
       window.innerWidth -
       document.getElementById("code_sider").offsetWidth.toString() +
       "px";
@@ -409,11 +414,7 @@ class App extends React.Component {
                 dataSource={this.state.scenarioData}
               />
             </Drawer>
-            <div id="recy">
-              <Title level={4}>Reccomentations For: Scenario 1</Title>
-              <Title level={3}>test</Title>
-              <div>lorem</div>
-            </div>
+            <RecommendationBox data={this.state.highestMetricsData}></RecommendationBox>
           </Layout>
         </Layout>
       </div>
