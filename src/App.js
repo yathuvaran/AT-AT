@@ -344,6 +344,10 @@ class App extends React.Component {
     return this.instance.getValue();
   }
 
+  setTextAreaValue(text){
+    this.instance.setValue(text)
+  }
+
   showDrawer = () => {
     this.setState({ visible: true });
   };

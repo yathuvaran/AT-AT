@@ -20,16 +20,13 @@ const { SubMenu } = Menu;
 
 class MenuBar extends Component {
   handleClick = (e) => {
-    console.log("click ", e);
     switch (e.key) {
       case "setting:4":
         Window.map.showRecommendations();
-        var message = this.props.enableRecommendation ? "Recommendations Disabled" : "Recommendations Enabled"
-        Window.map.openNotificationWithIcon(
-          "success",
-          message,
-          ""
-        );
+        var message = this.props.enableRecommendation
+          ? "Recommendations Disabled"
+          : "Recommendations Enabled";
+        Window.map.openNotificationWithIcon("success", message, "");
     }
   };
 
@@ -44,8 +41,23 @@ class MenuBar extends Component {
       >
         <SubMenu key="SubMenu1" icon={<SettingOutlined />} title="File">
           <Menu.Item key="setting:1" icon={<UploadOutlined />}>
-            <Upload id="ImportDSL" onChange={uiController.getImportedDSL}>
-              Import DSL
+            <Upload
+              accept=".txt, .csv"
+              showUploadList={false}
+              beforeUpload={(file) => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                  uiController.getImportedDSL(e.target.result)
+                };
+                reader.readAsText(file)
+                // Prevent upload
+                return false;
+              }}
+            >
+              <Button>
+                Import DSL
+              </Button>
             </Upload>
           </Menu.Item>
           <Menu.Item key="setting:2" icon={<FilePdfOutlined />}>
@@ -56,7 +68,11 @@ class MenuBar extends Component {
           </Menu.Item>
         </SubMenu>
         <SubMenu key="SubMenu2" icon={<DesktopOutlined />} title="View">
-          {this.props.enableRecommendation ? <Menu.Item key="setting:4">Disable Recommendations</Menu.Item> : <Menu.Item key="setting:4">Enable Recommendations</Menu.Item>}
+          {this.props.enableRecommendation ? (
+            <Menu.Item key="setting:4">Disable Recommendations</Menu.Item>
+          ) : (
+            <Menu.Item key="setting:4">Enable Recommendations</Menu.Item>
+          )}
         </SubMenu>
       </Menu>
     );

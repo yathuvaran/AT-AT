@@ -29,3 +29,10 @@ body {
 #tree{
   z-index: 3 !important;
 }
+
+input[type="file"] {
+  display: none;
+}
+.custom-file-upload {
+  cursor: pointer;
+}

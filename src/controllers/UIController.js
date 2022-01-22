@@ -6,13 +6,14 @@ export default class UIController {
     attackTreeController.parseDSL(Window.map.getTextAreaValue());
   }
 
-  getImportedDSL() {
-    console.log(document.getElementById("ImportDSL"));
+  getImportedDSL(text) {
+    console.log(text)
+    Window.map.setTextAreaValue(text);
   }
 
   highlightTree(treeData, path) {
     if (path.includes(treeData["ID"])) {
-        treeData["highlight"] = true;
+      treeData["highlight"] = true;
     }
     if (treeData.children !== undefined && treeData.children.length > 0) {
       for (var i = 0; i < treeData.children.length; i++) {
