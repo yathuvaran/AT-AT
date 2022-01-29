@@ -71,6 +71,7 @@ class App extends React.Component {
   }
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
+    console.log(this.state.scenarioData)
     //call uiController function after changed
     this.setState(
       {
@@ -372,9 +373,12 @@ class App extends React.Component {
     const { panes, activeKey } = this.state;
     if (this.instance != null) {
     }
+    console.log('app render')
     return (
       <div>
         <MenuBar
+          scenarioData={this.state.scenarioData}
+          originalTree={this.state.treeDataSaved}
           enableRecommendation={this.state.showRecommendations}
         ></MenuBar>
         <Tabs

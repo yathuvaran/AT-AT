@@ -285,6 +285,7 @@ export default class AttackTreeController {
     );
     output = output.substring(1, output.length - 1)
     Window.map.setTreeData(output);
+    console.log(output)
     const treeAnalyzerController = new TreeAnalyzerController();
     Window.map.setScenarioData(treeAnalyzerController.analyzeTree(
       JSON.parse(output)
