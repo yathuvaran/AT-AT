@@ -66,6 +66,7 @@ class App extends React.Component {
       selectedRowsArray: [],
       highestMetricsData: {},
       showRecommendations: false,
+      generated: false,
     };
     this.rowSelectionOnChange = this.rowSelectionOnChange.bind(this);
   }
@@ -81,7 +82,6 @@ class App extends React.Component {
           selectedRows[0].path
         ),
         highestMetricsData: selectedRows[0],
-        showRecommendations: this.state.showRecommendations,
       },
       () => {
         var highlight_links = document.getElementsByClassName("highlight_link");
@@ -190,7 +190,7 @@ class App extends React.Component {
   };
 
   /**
-   * On a change given an activeKey.
+   * On a change given an activeKey for tabs.
    * @param {number} activeKey An active key value.
    */
   onChange = (activeKey) => {
@@ -349,6 +349,13 @@ class App extends React.Component {
     this.instance.setValue(text)
   }
 
+  exportDSL(){
+    var blob = new Blob([this.getTextAreaValue()], {
+      type: "text/plain;charset=utf-8",
+    });
+    saveAs(blob, "DSL.txt");
+  }
+
   showDrawer = () => {
     this.setState({ visible: true });
   };
@@ -358,7 +365,7 @@ class App extends React.Component {
   };
 
   generate = () => {
-    this.setState({ selectedRowsArray: [] });
+    this.setState({ selectedRowsArray: [], generated: true });
     uiController.getInputtedDSL();
   };
 
@@ -366,6 +373,7 @@ class App extends React.Component {
     this.setState({
       treeData: JSON.parse(JSON.stringify(this.state.treeDataSaved)),
       selectedRowsArray: [],
+      highestMetricsData: {},
     });
   };
 
@@ -423,7 +431,7 @@ class App extends React.Component {
           </Sider>
           <Layout>
             <Content id="tree">
-              <D3Tree data={this.state.treeData} />
+              <D3Tree data={this.state.treeData} reportGen={false}/>
             </Content>
             <Drawer
               title="Attack Scenarios"

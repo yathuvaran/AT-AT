@@ -16,7 +16,6 @@ class RecommendationBox extends React.Component {
    * @return {Array} An array of recommendations.
    */
   generateRecommendations() {
-    console.log(this.props.data["highestMetrics"]);
     // Local map for metrics to full names.
     var metrics = {
       l: "Likelihood",

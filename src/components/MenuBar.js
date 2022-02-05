@@ -1,9 +1,13 @@
 import React, { useState, useEffect, Component } from "react";
 import ReactDOM from "react-dom";
+import ReactDOMServer from "react-dom/server";
 import "../App.css";
 import "antd/dist/antd.css";
 import "../index.css";
 import { Menu, Upload, message, Modal, Button } from "antd";
+import { Layout, Typography } from "antd";
+const { Title } = Typography;
+import { saveAs } from "file-saver";
 import {
   UploadOutlined,
   SettingOutlined,
@@ -14,6 +18,7 @@ import {
 import UIController from "../controllers/UIController";
 import { getByTestId } from "@testing-library/dom";
 import D3Tree from "./D3Tree";
+import RecommendationBox from "./RecommendationBox";
 
 const uiController = new UIController();
 
@@ -27,6 +32,7 @@ class MenuBar extends Component {
     };
   }
   handleClick = (e) => {
+    console.log(e);
     switch (e.key) {
       case "setting:4":
         Window.map.showRecommendations();
@@ -34,107 +40,111 @@ class MenuBar extends Component {
           ? "Recommendations Disabled"
           : "Recommendations Enabled";
         Window.map.openNotificationWithIcon("success", message, "");
+        break;
+      case "setting:2":
+        this.toggleOpened();
+        break;
       case "setting:3":
+        Window.map.exportDSL();
+        break;
     }
   };
+
+  createReport() {
+    const element = <div>{this.renderTrees()}</div>;
+    console.log(ReactDOMServer.renderToString(element));
+    var blob = new Blob([ReactDOMServer.renderToString(element)], {
+      type: "text/plain;charset=utf-8",
+    });
+    saveAs(blob, "Report.html");
+  }
 
   toggleOpened = () => {
     this.setState({ opened: !this.state.opened });
   };
 
-  handleOk = () => {
+  handleSave = () => {
     document
       .getElementsByClassName("ant-modal-body")[0]
       .insertAdjacentHTML(
         "beforeend",
         "<style>.highlight_link{stroke:red !important;stroke-width: 3;stroke-opacity: 1;}</style>"
       );
-    //this.copyStyles(document.getElementsByTagName('head')[0], document.getElementsByClassName('ant-modal-body')[0])
-    // var style_elems = document.getElementsByTagName('style')
-    // for (var i = 0; i < style_elems.length; i++){
-    //   document.getElementsByClassName('ant-modal-body')[0].appendChild(style_elems[i])
-    // }
+    [document.getElementsByClassName("ant-modal-body")[0]];
+    var blob = new Blob(
+      [document.getElementsByClassName("ant-modal-body")[0].innerHTML],
+      { type: "text/plain;charset=utf-8" }
+    );
+    console.log(document.getElementsByClassName("ant-modal-body")[0]);
+    saveAs(blob, "Report.html");
   };
 
   handleCancel = () => {
     this.setState({ opened: false });
   };
 
-  copyStyles(source, target) {
-    // Store style tags, avoid reflow in the loop
-    const headFrag = target;
-    console.log(source.styleSheets);
-    Array.from(document.styleSheets).forEach((styleSheet) => {
-      // For <style> elements
-      let rules;
-      try {
-        rules = styleSheet.cssRules;
-      } catch (err) {
-        console.error(err);
-      }
-      if (rules) {
-        // IE11 is very slow for appendChild, so use plain string here
-        const ruleText = [];
-
-        // Write the text of each rule into the body of the style element
-        Array.from(styleSheet.cssRules).forEach((cssRule) => {
-          const { type } = cssRule;
-
-          // Skip unknown rules
-          if (type === CSSRule.UNKNOWN_RULE) {
-            return;
-          }
-
-          let returnText = "";
-
-          if (type === CSSRule.KEYFRAMES_RULE) {
-            // IE11 will throw error when trying to access cssText property, so we
-            // need to assemble them
-            returnText = getKeyFrameText(cssRule);
-          } else if (
-            [CSSRule.IMPORT_RULE, CSSRule.FONT_FACE_RULE].includes(type)
-          ) {
-            // Check if the cssRule type is CSSImportRule (3) or CSSFontFaceRule (5)
-            // to handle local imports on a about:blank page
-            // '/custom.css' turns to 'http://my-site.com/custom.css'
-            returnText = fixUrlForRule(cssRule);
-          } else {
-            returnText = cssRule.cssText;
-          }
-          ruleText.push(returnText);
-        });
-
-        const newStyleEl = document.createElement("style");
-        newStyleEl.textContent = ruleText.join("\n");
-        headFrag.appendChild(newStyleEl);
-      } else if (styleSheet.href) {
-        // for <link> elements loading CSS from a URL
-        const newLinkEl = document.createElement("link");
-
-        newLinkEl.rel = "stylesheet";
-        newLinkEl.href = styleSheet.href;
-        headFrag.appendChild(newLinkEl);
+  /**
+   * Function to generate recommendations for report.
+   */
+  generateRecommendations(scenarioData) {
+    var metrics = {
+      l: "Likelihood",
+      v: "Victim Impact",
+      r: "Risk",
+      t: "Time Difficulty Ratio",
+    };
+    // Define local variables to store rows and count for a unique key.
+    var rows;
+    var count = 2;
+    console.log(scenarioData);
+    // Create an empty array for rows.
+    rows = [];
+    // Iterate across metrics and check if value is defined.
+    Object.keys(scenarioData["highestMetrics"]).forEach((metric) => {
+      if (scenarioData["highestMetrics"][metric][0]) {
+        // Push a recommendation to the rows array.
+        rows.push(
+          // Add a title element with the key being the count and the
+          // formatted text of the node and metrics.
+          <Title key={count} level={4}>
+            {'Node "' +
+              scenarioData["highestMetrics"][metric][1] +
+              '" with a ' +
+              metrics[metric] +
+              " of " +
+              scenarioData["highestMetrics"][metric][0]}
+          </Title>
+        );
+        count++;
       }
     });
-
-    //target.head.appendChild(headFrag)
+    return rows;
   }
 
   renderTrees() {
     var trees = [];
-    console.log(this.props.scenarioData);
-    for (var i = 0; i < this.props.scenarioData.length; i++) {
-      trees.push(
-        <div>
-          <h1>{this.props.scenarioData[i].name}</h1>
-          <D3Tree
-            data={uiController.highlightTree(
-              JSON.parse(JSON.stringify(this.props.originalTree)),
-              this.props.scenarioData[i].path
-            )}
-          ></D3Tree>
-        </div>
-      );
+    if (this.props.scenarioData) {
+      for (var i = 0; i < this.props.scenarioData.length; i++) {
+        trees.push(
+          <div key={i}>
+            <h1>{this.props.scenarioData[i].name}</h1>
+            <D3Tree
+              reportGen={true}
+              data={uiController.highlightTree(
+                JSON.parse(JSON.stringify(this.props.originalTree)),
+                this.props.scenarioData[i].path
+              )}
+            ></D3Tree>
+            <Title key={0} level={2}>
+              Recommendations for {this.props.scenarioData[i].name}
+            </Title>
+            <Title key={1} level={3}>
+              Highest Metrics to be Mitigated:
+            </Title>
+            {this.generateRecommendations(this.props.scenarioData[i])}
+          </div>
+        );
+      }
     }
     return trees;
   }
@@ -159,84 +169,74 @@ class MenuBar extends Component {
   render() {
     const { opened, count } = this.state;
     return (
-      <Menu
-        selectable={false}
-        onClick={this.handleClick}
-        //selectedKeys={[current]}
-        mode="horizontal"
-      >
-        <SubMenu key="SubMenu1" icon={<SettingOutlined />} title="File">
-          <Menu.Item key="setting:1" icon={<UploadOutlined />}>
-            <Upload
-              accept=".txt, .csv"
-              showUploadList={false}
-              beforeUpload={(file) => {
-                const reader = new FileReader();
+      <div>
+        <Menu
+          selectable={false}
+          onClick={this.handleClick}
+          //selectedKeys={[current]}
+          mode="horizontal"
+        >
+          <SubMenu key="SubMenu1" icon={<SettingOutlined />} title="File">
+            <Menu.Item key="setting:1" icon={<UploadOutlined />}>
+              <Upload
+                key="upload"
+                accept=".txt, .csv"
+                showUploadList={false}
+                beforeUpload={(file) => {
+                  const reader = new FileReader();
 
-                reader.onload = (e) => {
-                  uiController.getImportedDSL(e.target.result);
-                };
-                reader.readAsText(file);
-                // Prevent upload
-                return false;
-              }}
-            >
-              <Button>Import DSL</Button>
-            </Upload>
-          </Menu.Item>
-          <Menu.Item key="setting:2" icon={<FilePdfOutlined />}>
-            Export PDF
-          </Menu.Item>
-          <Menu.Item key="setting:3" icon={<FileOutlined />}>
-            Export HTML
-          </Menu.Item>
-        </SubMenu>
-        <SubMenu key="SubMenu2" icon={<DesktopOutlined />} title="View">
-          {this.props.enableRecommendation ? (
-            <Menu.Item key="setting:4">Disable Recommendations</Menu.Item>
-          ) : (
-            <Menu.Item key="setting:4">Enable Recommendations</Menu.Item>
-          )}
-        </SubMenu>
-        <Button onClick={this.toggleOpened}>Open</Button>
+                  reader.onload = (e) => {
+                    uiController.getImportedDSL(e.target.result);
+                  };
+                  reader.readAsText(file);
+                  // Prevent upload
+                  return false;
+                }}
+              >
+                <Button>Import DSL</Button>
+              </Upload>
+            </Menu.Item>
+            <Menu.Item key="setting:2" icon={<FilePdfOutlined />}>
+              Generate Report
+            </Menu.Item>
+            <Menu.Item key="setting:3" icon={<FilePdfOutlined />}>
+              Export DSL
+            </Menu.Item>
+          </SubMenu>
+          <SubMenu key="SubMenu2" icon={<DesktopOutlined />} title="View">
+            {this.props.enableRecommendation ? (
+              <Menu.Item key="setting:4">Disable Recommendations</Menu.Item>
+            ) : (
+              <Menu.Item key="setting:4">Enable Recommendations</Menu.Item>
+            )}
+          </SubMenu>
+        </Menu>
         <Modal
-          title="Basic Modal"
+          title={
+            <div>
+              <h1>Report Preview</h1>
+              <Button onClick={this.handleCancel}>Cancel</Button>
+              <Button onClick={this.handleSave}>Save Report</Button>
+            </div>
+          }
+          closable={false}
           visible={opened}
-          onOk={this.handleOk}
-          onCancel={this.handleCancel}
+          key="modal"
+          footer={null}
+          width="320"
         >
           <h1>Original Tree</h1>
           <D3Tree
+            key="og"
             data={this.props.originalTree ? this.props.originalTree : {}}
+            reportGen={true}
           ></D3Tree>
           {this.renderTrees()}
         </Modal>
-        {this.fixHighlighting()}
-      </Menu>
+        {/* {this.fixHighlighting()} */}
+      </div>
     );
   }
-}
-
-function getKeyFrameText(cssRule) {
-  const tokens = ["@keyframes", cssRule.name, "{"];
-  Array.from(cssRule.cssRules).forEach((cssRule) => {
-    // type === CSSRule.KEYFRAME_RULE should always be true
-    tokens.push(cssRule.keyText, "{", cssRule.style.cssText, "}");
-  });
-  tokens.push("}");
-  return tokens.join(" ");
-}
-
-function fixUrlForRule(cssRule) {
-  return cssRule.cssText
-    .split("url(")
-    .map((line) => {
-      if (line[1] === "/") {
-        return `${line.slice(0, 1)}${window.location.origin}${line.slice(1)}`;
-      }
-      return line;
-    })
-    .join("url(");
 }
 
 export default MenuBar;

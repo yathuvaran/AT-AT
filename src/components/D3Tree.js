@@ -238,6 +238,11 @@ class D3Tree extends React.Component {
         }
         pathClassFunc={this.getDynamicPathClass}
         pathFunc="step"
+        collapsible={this.props.reportGen ? false : true}
+        zoom={this.props.reportGen ? 2 : 1}
+        zoomable={this.props.reportGen ? true : true}
+        hasInteractiveNodes={this.props.reportGen ? false : true}
+        scaleExtent={this.props.reportGen ? {min:1,max:2} : undefined}
       ></Tree>
     );
   }
