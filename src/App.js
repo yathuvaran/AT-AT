@@ -341,8 +341,16 @@ class App extends React.Component {
   };
 
   generate = () => {
-    this.setState({ selectedRowsArray: [], generated: true });
-    uiController.getInputtedDSL();
+    this.setState(
+      {
+        selectedRowsArray: [], 
+        highestMetricsData: {},
+        generated: true,
+      },
+      () => {
+        uiController.getInputtedDSL(); 
+      }
+    );
   };
 
   clearSelection = () => {

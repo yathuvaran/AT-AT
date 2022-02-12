@@ -64,7 +64,7 @@ class D3Tree extends React.Component {
                 marginTop: 55,
                 fontWeight: "bold",
                 zIndex: 12,
-                backgroundColor: "#f0f2f5"
+                backgroundColor: "#f0f2f5",
               }}
             >
               {nodeDatum.name}
@@ -102,7 +102,7 @@ class D3Tree extends React.Component {
                 marginTop: 55,
                 fontWeight: "bold",
                 zIndex: 12,
-                backgroundColor: "#f0f2f5"
+                backgroundColor: "#f0f2f5",
               }}
             >
               {nodeDatum.name}
@@ -178,7 +178,7 @@ class D3Tree extends React.Component {
                 marginTop: 55,
                 fontWeight: "bold",
                 zIndex: 12,
-                backgroundColor: "#f0f2f5"
+                backgroundColor: "#f0f2f5",
               }}
             >
               {nodeDatum.name}
@@ -228,6 +228,29 @@ class D3Tree extends React.Component {
     }
   };
   render() {
+    console.log(this.props.reportGen);
+    if (this.props.reportGen) {
+      console.log(this.props.translate)
+      return (
+        <div className="treeContainer">
+          <Tree
+            orientation="vertical"
+            data={this.props.data}
+            translate={{ x: this.props.translate, y: 200}}
+            renderCustomNodeElement={(rd3tProps) =>
+              this.renderSvgNode({ ...rd3tProps, foreignObjectProps })
+            }
+            pathClassFunc={this.getDynamicPathClass}
+            pathFunc="step"
+            collapsible={this.props.reportGen ? false : true}
+            zoom={this.props.reportGen ? (this.props.translate > 2000 ? 2 : 1) : 1}
+            zoomable={this.props.reportGen ? false : true}
+            hasInteractiveNodes={this.props.reportGen ? true : false}
+            scaleExtent={this.props.reportGen ? { min: 1, max: 2 } : undefined}
+          ></Tree>
+        </div>
+      );
+    }
     return (
       <Tree
         orientation="vertical"
@@ -240,9 +263,9 @@ class D3Tree extends React.Component {
         pathFunc="step"
         collapsible={this.props.reportGen ? false : true}
         zoom={this.props.reportGen ? 2 : 1}
-        zoomable={this.props.reportGen ? true : true}
-        hasInteractiveNodes={this.props.reportGen ? false : true}
-        scaleExtent={this.props.reportGen ? {min:1,max:2} : undefined}
+        zoomable={this.props.reportGen ? false : true}
+        hasInteractiveNodes={this.props.reportGen ? true : false}
+        scaleExtent={this.props.reportGen ? { min: 1, max: 2 } : undefined}
       ></Tree>
     );
   }

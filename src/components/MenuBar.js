@@ -12,7 +12,7 @@ import {
   UploadOutlined,
   SettingOutlined,
   DesktopOutlined,
-  FilePdfOutlined,
+  DownloadOutlined,
   FileOutlined,
 } from "@ant-design/icons";
 import UIController from "../controllers/UIController";
@@ -29,8 +29,14 @@ class MenuBar extends Component {
     super(props);
     this.state = {
       opened: false,
+      translate: 0,
     };
   }
+
+  componentDidMount() {
+    this.setState({translate: document.getElementsByClassName("rd3t-svg")[0].width.baseVal.value})
+  }
+
   handleClick = (e) => {
     console.log(e);
     switch (e.key) {
@@ -60,7 +66,14 @@ class MenuBar extends Component {
   }
 
   toggleOpened = () => {
-    this.setState({ opened: !this.state.opened });
+    this.setState(
+      {
+        opened: !this.state.opened
+      },
+      () => {
+        this.setState({translate: document.getElementsByClassName("rd3t-svg")[0].width.baseVal.value})
+      }
+    )
   };
 
   handleSave = () => {
@@ -110,11 +123,11 @@ class MenuBar extends Component {
             // formatted text of the node and metrics.
             <li>
               {'Node "' +
-                this.props.data["highestMetrics"][metric][1] +
+                scenarioData["highestMetrics"][metric][1] +
                 '" with a ' +
                 metrics[metric] +
                 " of " +
-                this.props.data["highestMetrics"][metric][0]}
+                scenarioData["highestMetrics"][metric][0]}
             </li>
           );
           count++;
@@ -156,6 +169,7 @@ class MenuBar extends Component {
             <h1>{this.props.scenarioData[i].name}</h1>
             <D3Tree
               reportGen={true}
+              translate={this.state.translate}
               data={uiController.highlightTree(
                 JSON.parse(JSON.stringify(this.props.originalTree)),
                 this.props.scenarioData[i].path
@@ -173,6 +187,13 @@ class MenuBar extends Component {
       }
     }
     return trees;
+  }
+
+  fixSizing(){
+    var treeContainers = document.getElementsByClassName("treeContainer");
+    for (var i = 0; i < treeContainers.length; i++){
+      treeContainers[i].style.height = document.getElementsByClassName("rd3t-svg")[0].height.baseVal.value
+    }
   }
 
   fixHighlighting() {
@@ -206,7 +227,7 @@ class MenuBar extends Component {
             <Menu.Item key="setting:1" icon={<UploadOutlined />}>
               <Upload
                 key="upload"
-                accept=".txt, .csv"
+                accept=".txt"
                 showUploadList={false}
                 beforeUpload={(file) => {
                   const reader = new FileReader();
@@ -222,10 +243,10 @@ class MenuBar extends Component {
                 <Button>Import DSL</Button>
               </Upload>
             </Menu.Item>
-            <Menu.Item key="setting:2" icon={<FilePdfOutlined />}>
+            <Menu.Item key="setting:2" icon={<FileOutlined />}>
               Generate Report
             </Menu.Item>
-            <Menu.Item key="setting:3" icon={<FilePdfOutlined />}>
+            <Menu.Item key="setting:3" icon={<DownloadOutlined />}>
               Export DSL
             </Menu.Item>
           </SubMenu>
@@ -256,10 +277,11 @@ class MenuBar extends Component {
             key="og"
             data={this.props.originalTree ? this.props.originalTree : {}}
             reportGen={true}
+            translate={this.state.translate}
           ></D3Tree>
           {this.renderTrees()}
         </Modal>
-        {/* {this.fixHighlighting()} */}
+        {this.fixSizing()}
       </div>
     );
   }

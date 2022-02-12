@@ -35,7 +35,6 @@ export default class TreeAnalyzerController {
 
           // Loop over each specific recommendation and check if it's in the node name.
           for (const [key, value] of Object.entries(attackPatterns)) {
-            console.log(paths[i]);
             if (paths[i][j]["name"].toLowerCase().includes(key.toLowerCase())) {
               specificMitigations[key] = value;
             }
@@ -54,6 +53,11 @@ export default class TreeAnalyzerController {
     for (var i = 0; i < pathSeverity.length; i++) {
       pathSeverity[i]["name"] = "Scenario " + (i + 1)
       pathSeverity[i]["key"] = (i + 1)
+    }
+    for (var i = 0; i < pathSeverity.length; i++){
+      if (pathSeverity[i]["severity"] == 0){
+        pathSeverity[i]["severity"] = "N/A"
+      }
     }
     console.log(pathSeverity)
     return pathSeverity
