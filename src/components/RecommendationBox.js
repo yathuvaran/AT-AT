@@ -37,19 +37,34 @@ class RecommendationBox extends React.Component {
           rows.push(
             // Add a title element with the key being the count and the
             // formatted text of the node and metrics.
-            <Title key={count} level={4}>
+            <li>
               {'Node "' +
                 this.props.data["highestMetrics"][metric][1] +
                 '" with a ' +
                 metrics[metric] +
                 " of " +
                 this.props.data["highestMetrics"][metric][0]}
-            </Title>
+            </li>
           );
           count++;
         }
       });
     }
+    // Iterate across specific mitigation keys and add them as a header.
+    Object.keys(this.props.data["specificMitigations"]).forEach((attack) => {
+      rows.push(
+        <h3>{attack}</h3>
+      )
+      // Iterate across each attack mitigation and add it to the list.
+      for (var i = 0; i < this.props.data["specificMitigations"][attack].length; i++) {
+        console.log(this.props.data["specificMitigations"][attack][i])
+        rows.push(
+          <li><a key={"Mitigation" + i} href={this.props.data["specificMitigations"][attack][i]["Link"]} target="_blank">
+            {this.props.data["specificMitigations"][attack][i]["Mitigation"]}
+          </a></li>
+        );
+      }
+    });
     return rows;
   }
   /**
@@ -71,12 +86,12 @@ class RecommendationBox extends React.Component {
     }
     return (
       <div id="recommendation_box">
-        <Title key={0} level={2}>
+        <h1>
           Recommendations for {this.props.data.name}
-        </Title>
-        <Title key={1} level={3}>
+        </h1>
+        <h2>
           Highest Metrics to be Mitigated:
-        </Title>
+        </h2>
         {this.generateRecommendations()}
       </div>
     );

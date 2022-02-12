@@ -65,6 +65,7 @@ class App extends React.Component {
       scenarioData: [],
       selectedRowsArray: [],
       highestMetricsData: {},
+      specificRecommendationsData: {},
       showRecommendations: false,
       generated: false,
     };
@@ -73,7 +74,7 @@ class App extends React.Component {
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
     console.log(this.state.scenarioData)
-    //call uiController function after changed
+    // Call uiController function after changed
     this.setState(
       {
         selectedRowsArray: selectedRowKeys,
@@ -97,31 +98,6 @@ class App extends React.Component {
         }
       }
     );
-    // this.setState({
-    //   selectedRowsArray: selectedRowKeys,
-    //   treeData: uiController.highlightTree(
-    //     JSON.parse(JSON.stringify(this.state.treeDataSaved)),
-    //     selectedRows[0].path
-    //   ),
-    // });
-    // will not work if only one node
-    // var highlight_links = document.getElementsByClassName("highlight_link");
-    // console.log(highlight_links)
-    // const parent = highlight_links[0].parentNode;
-    // while (highlight_links.length > 0) {
-    //   highlight_links[0].parentNode.removeChild(highlight_links[0]);
-    // }
-    // console.log(parent);
-    // console.log('default', default_links)
-    // for (var i = 0; i < default_links.length; i++) {
-    //   parent.appendChild(default_links[0]);
-    // }
-    // for (var i = 0; i < highlight_links.length; i++) {
-    //   parent.appendChild(highlight_links[0]);
-    // }
-    // console.log(default_links);
-    // console.log(highlight_links);
-    // console.log(parent);
   }
 
   /**

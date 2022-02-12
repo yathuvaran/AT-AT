@@ -87,6 +87,7 @@ class MenuBar extends Component {
    * Function to generate recommendations for report.
    */
   generateRecommendations(scenarioData) {
+    // Local map for metrics to full names.
     var metrics = {
       l: "Likelihood",
       v: "Victim Impact",
@@ -96,26 +97,51 @@ class MenuBar extends Component {
     // Define local variables to store rows and count for a unique key.
     var rows;
     var count = 2;
-    console.log(scenarioData);
-    // Create an empty array for rows.
-    rows = [];
-    // Iterate across metrics and check if value is defined.
-    Object.keys(scenarioData["highestMetrics"]).forEach((metric) => {
-      if (scenarioData["highestMetrics"][metric][0]) {
-        // Push a recommendation to the rows array.
+    // If data is defined.
+    if (scenarioData) {
+      // Create an empty array for rows.
+      rows = [];
+      // Iterate across metrics and check if value is defined.
+      Object.keys(scenarioData["highestMetrics"]).forEach((metric) => {
+        if (scenarioData["highestMetrics"][metric][0]) {
+          // Push a recommendation to the rows array.
+          rows.push(
+            // Add a title element with the key being the count and the
+            // formatted text of the node and metrics.
+            <li>
+              {'Node "' +
+                this.props.data["highestMetrics"][metric][1] +
+                '" with a ' +
+                metrics[metric] +
+                " of " +
+                this.props.data["highestMetrics"][metric][0]}
+            </li>
+          );
+          count++;
+        }
+      });
+    }
+    // Iterate across specific mitigation keys and add them as a header.
+    Object.keys(scenarioData["specificMitigations"]).forEach((attack) => {
+      rows.push(<h3>{attack}</h3>);
+      // Iterate across each attack mitigation and add it to the list.
+      for (
+        var i = 0;
+        i < scenarioData["specificMitigations"][attack].length;
+        i++
+      ) {
+        console.log(scenarioData["specificMitigations"][attack][i]);
         rows.push(
-          // Add a title element with the key being the count and the
-          // formatted text of the node and metrics.
-          <Title key={count} level={4}>
-            {'Node "' +
-              scenarioData["highestMetrics"][metric][1] +
-              '" with a ' +
-              metrics[metric] +
-              " of " +
-              scenarioData["highestMetrics"][metric][0]}
-          </Title>
+          <li>
+            <a
+              key={"Mitigation" + i}
+              href={scenarioData["specificMitigations"][attack][i]["Link"]}
+              target="_blank"
+            >
+              {scenarioData["specificMitigations"][attack][i]["Mitigation"]}
+            </a>
+          </li>
         );
-        count++;
       }
     });
     return rows;

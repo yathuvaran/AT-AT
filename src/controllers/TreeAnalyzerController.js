@@ -1,3 +1,4 @@
+import { attackPatterns } from "../assets/AttackPatterns";
 export default class TreeAnalyzerController {
   /**
    * Analyzes a tree.
@@ -16,12 +17,14 @@ export default class TreeAnalyzerController {
     for (var i = 0; i < paths.length; i++) {
       // Initialize object to hold 4 highest metrics for the path
       var highestMetrics = {};
+      //Initialize object to hold specific mitigations
+      var specificMitigations = {};
 
       pathSeverity.unshift({ path: [], severity: 0 , highestMetrics: {}});
       // Iterate across the nodes in each path and push that node to the path.
       for (var j = 0; j < paths[i].length; j++) {
         
-        //check if leaf first, if so, determine if it has highest metrics in path
+        // Check if leaf first, if so, determine if it has highest metrics in path.
           if (paths[i][j]["metrics"]) {
             metrics.forEach(metric => {
               if(!highestMetrics[metric] || !highestMetrics[metric][0] || highestMetrics[metric][0] < paths[i][j]["metrics"][metric]) {
@@ -30,11 +33,20 @@ export default class TreeAnalyzerController {
             })           
           }
 
+          // Loop over each specific recommendation and check if it's in the node name.
+          for (const [key, value] of Object.entries(attackPatterns)) {
+            console.log(paths[i]);
+            if (paths[i][j]["name"].toLowerCase().includes(key.toLowerCase())) {
+              specificMitigations[key] = value;
+            }
+          }
+
           pathSeverity[0]["path"].push(paths[i][j]["id"]);
           // Add to the severity each of the valued weights.
           pathSeverity[0]["severity"] += paths[i][j]["value"];
       }
       pathSeverity[0]["highestMetrics"] = highestMetrics;
+      pathSeverity[0]["specificMitigations"] = specificMitigations;
       
     }
     // Sort array in decreasing order by severity.
@@ -99,7 +111,7 @@ export default class TreeAnalyzerController {
       // Iterate across paths and add current node id at front.
       for (var j = 0; j < paths.length; j++) {
         console.log(paths);
-        paths[j].unshift({ id: tree["ID"], value: 0 });
+        paths[j].unshift({ id: tree["ID"], value: 0, name: tree["name"]});
       }
       console.log(paths);
       return paths;
