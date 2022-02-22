@@ -108,9 +108,7 @@ class App extends React.Component {
    */
   openNotificationWithIcon = (type, title, desc) => {
     notification[type]({
-      style: {
-        whiteSpace: "pre",
-      },
+     
       message: title,
       description: desc,
     });
