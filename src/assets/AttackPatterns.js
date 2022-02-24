@@ -172,12 +172,6 @@ export var attackPatterns = {
       Link: "https://attack.mitre.org/mitigations/M1022/",
     },
   ],
-  "Password Stores": [
-    {
-      Mitigation: "Password Policies",
-      Link: "https://attack.mitre.org/mitigations/M1027/",
-    },
-  ],
   "Drive-by Compromise": [
     {
       Mitigation: "Application Isolation and Sandboxing",
