@@ -1,0 +1,27 @@
+Access Database;OR
+	A;OR
+		A;OR
+			A;OR
+				A;OR
+					A;OR
+						A;OR
+							A;OR
+								A;OR
+									Password Stores;l=0.6;v=0.2;r=0.9;t=0.1
+	A;AND
+		A;AND
+			A;AND
+				A;AND
+					A;AND
+						A;AND
+							A;AND
+								A;AND
+									Password Stores;l=0.6;v=0.2;r=0.9;t=0.1
+		A;AND
+			A;AND
+				A;AND
+					A;AND
+						A;AND
+							A;AND
+								A;AND
+									Password Stores;l=0.6;v=0.2;r=0.9;t=0.1
