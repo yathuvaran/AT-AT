@@ -104,7 +104,7 @@ class MenuBar extends Component {
     var metrics = {
       l: "Likelihood",
       v: "Victim Impact",
-      r: "Risk",
+      r: "Resource Points",
       t: "Time Difficulty Ratio",
     };
     // Define local variables to store rows and count for a unique key.
