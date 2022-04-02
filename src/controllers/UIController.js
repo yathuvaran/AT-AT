@@ -7,7 +7,6 @@ export default class UIController {
   }
 
   getImportedDSL(text) {
-    console.log(text)
     Window.map.setTextAreaValue(text);
   }
 

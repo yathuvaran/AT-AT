@@ -34,7 +34,24 @@ const columns = [
   },
   {
     title: "Severity",
-    dataIndex: "severity",
+    children: [
+      {
+        title: "L",
+        dataIndex: "l",
+      },
+      {
+        title: "V",
+        dataIndex: "v",
+      },
+      {
+        title: "R",
+        dataIndex: "r",
+      },
+      {
+        title: "T",
+        dataIndex: "t",
+      },
+    ],
   },
 ];
 
@@ -73,7 +90,7 @@ class App extends React.Component {
   }
 
   rowSelectionOnChange(selectedRowKeys, selectedRows) {
-    console.log(this.state.scenarioData)
+    console.log(this.state.scenarioData);
     // Call uiController function after changed
     this.setState(
       {
@@ -108,7 +125,6 @@ class App extends React.Component {
    */
   openNotificationWithIcon = (type, title, desc) => {
     notification[type]({
-     
       message: title,
       description: desc,
     });
@@ -123,15 +139,15 @@ class App extends React.Component {
     // Calculate the height to be the inner window height minus the generate
     // height and subtract the tab height to maximize the codemirror height.
     console.log(document.getElementById("tree").offsetWidth.toString() + "px");
-    console.log(document.getElementsByClassName("ant-menu")[0])
+    console.log(document.getElementsByClassName("ant-menu")[0]);
     this.instance.setSize(
       350,
       window.innerHeight -
         document.getElementById("generateButtonDiv").scrollHeight -
         document.getElementsByClassName("ant-tabs")[0].clientHeight -
         document.getElementsByClassName("ant-menu")[0].scrollHeight
-      );
-    
+    );
+
     // Check if recommendation box present before getting the style.
     if (document.getElementById("recommendation_box")) {
       document.getElementById("recommendation_box").style.width =
@@ -158,7 +174,7 @@ class App extends React.Component {
       350,
       window.innerHeight -
         document.getElementById("generateButtonDiv").scrollHeight -
-        document.getElementsByClassName("ant-tabs")[0].clientHeight - 
+        document.getElementsByClassName("ant-tabs")[0].clientHeight -
         document.getElementsByClassName("ant-menu")[0].scrollHeight
     );
   };
@@ -319,11 +335,11 @@ class App extends React.Component {
     return this.instance.getValue();
   }
 
-  setTextAreaValue(text){
-    this.instance.setValue(text)
+  setTextAreaValue(text) {
+    this.instance.setValue(text);
   }
 
-  exportDSL(){
+  exportDSL() {
     var blob = new Blob([this.getTextAreaValue()], {
       type: "text/plain;charset=utf-8",
     });
@@ -341,12 +357,12 @@ class App extends React.Component {
   generate = () => {
     this.setState(
       {
-        selectedRowsArray: [], 
+        selectedRowsArray: [],
         highestMetricsData: {},
         generated: true,
       },
       () => {
-        uiController.getInputtedDSL(); 
+        uiController.getInputtedDSL();
       }
     );
   };
@@ -363,7 +379,7 @@ class App extends React.Component {
     const { panes, activeKey } = this.state;
     if (this.instance != null) {
     }
-    console.log('app render')
+    console.log("app render");
     return (
       <div>
         <MenuBar
@@ -413,18 +429,20 @@ class App extends React.Component {
           </Sider>
           <Layout>
             <Content id="tree">
-              <D3Tree data={this.state.treeData} reportGen={false}/>
+              <D3Tree data={this.state.treeData} reportGen={false} />
             </Content>
             <Drawer
               title="Attack Scenarios"
               placement="right"
               onClose={this.onClose}
               visible={this.state.visible}
+              width={450}
             >
               <Button onClick={this.clearSelection}>Clear</Button>
               <Table
                 style={{ height: "400px" }}
                 pagination={false}
+                bordered
                 rowSelection={{
                   type: "radio",
                   onChange: this.rowSelectionOnChange,

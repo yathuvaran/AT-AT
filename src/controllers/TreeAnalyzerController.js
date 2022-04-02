@@ -20,47 +20,119 @@ export default class TreeAnalyzerController {
       //Initialize object to hold specific mitigations
       var specificMitigations = {};
 
-      pathSeverity.unshift({ path: [], severity: 0 , highestMetrics: {}});
+      pathSeverity.unshift({
+        path: [],
+        severity: 0,
+        highestMetrics: {},
+        l: -1,
+        v: -1,
+        r: -1,
+        t: -1,
+        tupledSeverity: "",
+      });
       // Iterate across the nodes in each path and push that node to the path.
       for (var j = 0; j < paths[i].length; j++) {
-        
         // Check if leaf first, if so, determine if it has highest metrics in path.
-          if (paths[i][j]["metrics"]) {
-            metrics.forEach(metric => {
-              if(!highestMetrics[metric] || !highestMetrics[metric][0] || highestMetrics[metric][0] < paths[i][j]["metrics"][metric]) {
-                highestMetrics[metric] = [paths[i][j]["metrics"][metric], paths[i][j]["name"]] ;
-              }
-            })           
-          }
+        if (paths[i][j]["metrics"]) {
+          metrics.forEach((metric) => {
+            if (
+              !highestMetrics[metric] ||
+              !highestMetrics[metric][0] ||
+              highestMetrics[metric][0] < paths[i][j]["metrics"][metric]
+            ) {
+              highestMetrics[metric] = [
+                paths[i][j]["metrics"][metric],
+                paths[i][j]["name"],
+              ];
+            }
+          });
 
-          // Loop over each specific recommendation and check if it's in the node name.
-          for (const [key, value] of Object.entries(attackPatterns)) {
-            if (paths[i][j]["name"].toLowerCase().includes(key.toLowerCase())) {
-              specificMitigations[key] = value;
+          console.log(paths[i][j]["metrics"]);
+          if (paths[i][j]["metrics"]["l"] !== undefined) {
+            if (pathSeverity[0]["l"] == -1) {
+              pathSeverity[0]["l"] = paths[i][j]["metrics"]["l"];
+            } else {
+              pathSeverity[0]["l"] *= paths[i][j]["metrics"]["l"];
             }
           }
 
-          pathSeverity[0]["path"].push(paths[i][j]["id"]);
-          // Add to the severity each of the valued weights.
-          pathSeverity[0]["severity"] += paths[i][j]["value"];
+          if (paths[i][j]["metrics"]["v"] !== undefined) {
+            if (pathSeverity[0]["v"] == -1) {
+              pathSeverity[0]["v"] = paths[i][j]["metrics"]["v"];
+            } else {
+              pathSeverity[0]["v"] *= paths[i][j]["metrics"]["v"];
+            }
+          }
+
+          if (paths[i][j]["metrics"]["r"] !== undefined) {
+            if (pathSeverity[0]["r"] == -1) {
+              pathSeverity[0]["r"] = paths[i][j]["metrics"]["r"];
+            } else {
+              pathSeverity[0]["r"] *= paths[i][j]["metrics"]["r"];
+            }
+          }
+
+          if (paths[i][j]["metrics"]["t"] !== undefined) {
+            if (pathSeverity[0]["t"] == -1) {
+              pathSeverity[0]["t"] = paths[i][j]["metrics"]["t"];
+            } else {
+              pathSeverity[0]["t"] *= paths[i][j]["metrics"]["t"];
+            }
+          }
+        }
+
+        // Add to the severity each of the valued weights.
+        pathSeverity[0]["severity"] += paths[i][j]["value"];
+        pathSeverity[0]["path"].push(paths[i][j]["id"]);
+
+        // Loop over each specific recommendation and check if it's in the node name.
+        for (const [key, value] of Object.entries(attackPatterns)) {
+          if (paths[i][j]["name"].toLowerCase().includes(key.toLowerCase())) {
+            specificMitigations[key] = value;
+          }
+        }
       }
       pathSeverity[0]["highestMetrics"] = highestMetrics;
       pathSeverity[0]["specificMitigations"] = specificMitigations;
-      
     }
     // Sort array in decreasing order by severity.
-    pathSeverity.sort((a,b) => b.severity - a.severity)
+    pathSeverity.sort((a, b) => b.severity - a.severity);
     for (var i = 0; i < pathSeverity.length; i++) {
-      pathSeverity[i]["name"] = "Scenario " + (i + 1)
-      pathSeverity[i]["key"] = (i + 1)
+      pathSeverity[i]["name"] = "Scenario " + (i + 1);
+      pathSeverity[i]["key"] = i + 1;
     }
-    for (var i = 0; i < pathSeverity.length; i++){
-      if (pathSeverity[i]["severity"] == 0){
-        pathSeverity[i]["severity"] = "N/A"
+    for (var i = 0; i < pathSeverity.length; i++) {
+      if (pathSeverity[i]["severity"] == 0) {
+        pathSeverity[i]["severity"] = "N/A";
       }
+      if (pathSeverity[i]["l"] == -1) {
+        pathSeverity[i]["l"] = "N/A";
+      }
+      else {
+        pathSeverity[i]["l"] = pathSeverity[i]["l"].toFixed(2)
+      }
+      if (pathSeverity[i]["v"] == -1) {
+        pathSeverity[i]["v"] = "N/A";
+      }
+      else {
+        pathSeverity[i]["v"] = pathSeverity[i]["v"].toFixed(2)
+      }
+      if (pathSeverity[i]["r"] == -1) {
+        pathSeverity[i]["r"] = "N/A";
+      }
+      else {
+        pathSeverity[i]["r"] = pathSeverity[i]["r"].toFixed(2)
+      }
+      if (pathSeverity[i]["t"] == -1) {
+        pathSeverity[i]["t"] = "N/A";
+      }
+      else {
+        pathSeverity[i]["t"] = pathSeverity[i]["t"].toFixed(2)
+      }
+      
     }
-    console.log(pathSeverity)
-    return pathSeverity
+    console.log(pathSeverity);
+    return pathSeverity;
   }
 
   /**
@@ -73,8 +145,15 @@ export default class TreeAnalyzerController {
     //base case; if a leaf node or root node by itself
     if (!("children" in tree)) {
       // Add an array to paths with the current node.
-      console.log(tree)
-      paths.push([{ id: tree["ID"], value: this.calculateAverage(tree), metrics: this.getMetrics(tree), name: tree["name"] }]);
+      console.log(tree);
+      paths.push([
+        {
+          id: tree["ID"],
+          value: this.calculateAverage(tree),
+          metrics: this.getMetrics(tree),
+          name: tree["name"],
+        },
+      ]);
       return paths;
     }
     //is a parent node
@@ -115,16 +194,15 @@ export default class TreeAnalyzerController {
       // Iterate across paths and add current node id at front.
       for (var j = 0; j < paths.length; j++) {
         console.log(paths);
-        paths[j].unshift({ id: tree["ID"], value: 0, name: tree["name"]});
+        paths[j].unshift({ id: tree["ID"], value: 0, name: tree["name"] });
       }
       console.log(paths);
       return paths;
     }
   }
 
-
   getMetrics(tree) {
-    return {"l": tree["l"], "v": tree["v"], "r": tree["r"], "t": tree["t"]}
+    return { l: tree["l"], v: tree["v"], r: tree["r"], t: tree["t"] };
   }
 
   /**
