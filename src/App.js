@@ -436,7 +436,7 @@ class App extends React.Component {
               placement="right"
               onClose={this.onClose}
               visible={this.state.visible}
-              width={450}
+              width={500}
             >
               <Button onClick={this.clearSelection}>Clear</Button>
               <Table
