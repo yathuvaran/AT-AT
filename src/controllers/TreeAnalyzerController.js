@@ -25,9 +25,9 @@ export default class TreeAnalyzerController {
         severity: 0,
         highestMetrics: {},
         l: -1,
-        v: -1,
-        r: -1,
-        t: -1,
+        v: [],
+        r: [],
+        t: [],
         tupledSeverity: "",
       });
       // Iterate across the nodes in each path and push that node to the path.
@@ -57,27 +57,15 @@ export default class TreeAnalyzerController {
           }
 
           if (paths[i][j]["metrics"]["v"] !== undefined) {
-            if (pathSeverity[0]["v"] == -1) {
-              pathSeverity[0]["v"] = paths[i][j]["metrics"]["v"];
-            } else {
-              pathSeverity[0]["v"] *= paths[i][j]["metrics"]["v"];
-            }
+            pathSeverity[0]["v"].push(paths[i][j]["metrics"]["v"]);
           }
 
           if (paths[i][j]["metrics"]["r"] !== undefined) {
-            if (pathSeverity[0]["r"] == -1) {
-              pathSeverity[0]["r"] = paths[i][j]["metrics"]["r"];
-            } else {
-              pathSeverity[0]["r"] *= paths[i][j]["metrics"]["r"];
-            }
+            pathSeverity[0]["r"].push(paths[i][j]["metrics"]["r"]);
           }
 
           if (paths[i][j]["metrics"]["t"] !== undefined) {
-            if (pathSeverity[0]["t"] == -1) {
-              pathSeverity[0]["t"] = paths[i][j]["metrics"]["t"];
-            } else {
-              pathSeverity[0]["t"] *= paths[i][j]["metrics"]["t"];
-            }
+            pathSeverity[0]["t"].push(paths[i][j]["metrics"]["t"]);
           }
         }
 
@@ -107,29 +95,41 @@ export default class TreeAnalyzerController {
       }
       if (pathSeverity[i]["l"] == -1) {
         pathSeverity[i]["l"] = "N/A";
-      }
-      else {
-        pathSeverity[i]["l"] = pathSeverity[i]["l"].toFixed(2)
-      }
-      if (pathSeverity[i]["v"] == -1) {
-        pathSeverity[i]["v"] = "N/A";
-      }
-      else {
-        pathSeverity[i]["v"] = pathSeverity[i]["v"].toFixed(2)
-      }
-      if (pathSeverity[i]["r"] == -1) {
-        pathSeverity[i]["r"] = "N/A";
-      }
-      else {
-        pathSeverity[i]["r"] = pathSeverity[i]["r"].toFixed(2)
-      }
-      if (pathSeverity[i]["t"] == -1) {
-        pathSeverity[i]["t"] = "N/A";
-      }
-      else {
-        pathSeverity[i]["t"] = pathSeverity[i]["t"].toFixed(2)
+      } else {
+        pathSeverity[i]["l"] = pathSeverity[i]["l"].toFixed(2);
       }
       
+      if (pathSeverity[i]["v"].length == 0) {
+        console.log("in N/A")
+        console.log(pathSeverity[i]["v"])
+        pathSeverity[i]["v"] = "N/A";
+      } else {
+        console.log("Not in N/A")
+        console.log(pathSeverity[i]["v"])
+        var sum = 0;
+        for (var j = 0; j < pathSeverity[i]["v"].length; j++) {
+          sum += pathSeverity[i]["v"][j];
+        }
+        pathSeverity[i]["v"] = (sum / pathSeverity[i]["v"].length).toFixed(2);
+      }
+      if (pathSeverity[i]["r"].length == 0) {
+        pathSeverity[i]["r"] = "N/A";
+      } else {
+        var sum = 0;
+        for (var j = 0; j < pathSeverity[i]["r"].length; j++) {
+          sum += pathSeverity[i]["r"][j];
+        }
+        pathSeverity[i]["r"] = (sum / pathSeverity[i]["r"].length).toFixed(2);
+      }
+      if (pathSeverity[i]["t"].length == 0) {
+        pathSeverity[i]["t"] = "N/A";
+      } else {
+        var sum = 0;
+        for (var j = 0; j < pathSeverity[i]["t"].length; j++) {
+          sum += pathSeverity[i]["t"][j];
+        }
+        pathSeverity[i]["t"] = (sum / pathSeverity[i]["t"].length).toFixed(2);
+      }
     }
     console.log(pathSeverity);
     return pathSeverity;
