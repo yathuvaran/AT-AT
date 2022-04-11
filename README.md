@@ -14,6 +14,8 @@ AT-AT (Attack Tree Analysis Tool) is a application that allows users to develop 
 - Allows multiple trees to be modeled and analyzed at the same time by switching between tabs in the application
 - Generates an HTML report of the attack tree analysis which includes all attack scenarios and recommendations
 
+![Animation](https://user-images.githubusercontent.com/49103000/162790364-1ef16090-8c68-420c-b465-f07abbc6aaf3.gif)
+
 ## Available Scripts
 
 In the project directory, you can run:
