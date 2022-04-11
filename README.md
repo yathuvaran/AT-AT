@@ -16,6 +16,11 @@ AT-AT (Attack Tree Analysis Tool) is a application that allows users to develop 
 
 ![Animation](https://user-images.githubusercontent.com/49103000/162790364-1ef16090-8c68-420c-b465-f07abbc6aaf3.gif)
 
+## Documentation
+
+- [User Manual](Documentation/User%20Manual.pdf)
+- [Testing Document](Documentation/Testing%20Document.pdf)
+
 ## Available Scripts
 
 In the project directory, you can run:
