@@ -1,7 +1,0 @@
-Access Database;OR
-	Gain Database Info;OR
-		Email Collection;l=0.3
-		XSL Script;v=0.4
-	Brute Force Attack;AND
-		SQL Injection;l=0.5;v=0.3;r=0.2;t=0.9
-		Password Stores;l=0.6;v=0.2;r=0.9;t=0.1
