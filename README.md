@@ -21,6 +21,10 @@ AT-AT (Attack Tree Analysis Tool) is a application that allows users to develop 
 - [User Manual](Documentation/User%20Manual.pdf)
 - [Testing Document](Documentation/Testing%20Document.pdf)
 
+## Download
+
+[Latest Release](https://github.com/yathuvaran/AT-AT/releases/tag/v1.0.0)
+
 ## Available Scripts
 
 In the project directory, you can run:
